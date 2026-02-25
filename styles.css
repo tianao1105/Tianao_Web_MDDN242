@@ -2,12 +2,32 @@ body {
   margin: 0;
   padding: 40px;
   font-family: Arial, sans-serif;
-  background: #fcf8f6;
+  background: #b3fcf5da;
+
+  /* 自定义鼠标指针：使用 images/cursor.png */
+  /* 如果点击点不合适，可以调整后面的两个数字，例如 16 16 */
+  cursor: url('images/cursor.png') 18 12, auto;
+}
+
+
+
+
+
+
+
+
+
+:root {
+  --works-max-width: 1500px;  /* 调整整体区域宽度，影响卡片大小 */
+  --grid-columns: 3;          /* 每行卡片数量 */
+  --card-gap: 20px;           /* 卡片间距 */
+  --card-aspect: 16 / 9;      /* 卡片封面比例 */
+  --card-radius: 20px;        /* 卡片圆角 */
 }
 
 /* Title */
 .title {
-  color: #15267a;
+  color: #000000;
   margin-bottom: 4px;
   font-weight: 500;
 }
@@ -16,8 +36,86 @@ body {
 .underline {
   width: 200px;
   height: 2px;
-  background: #d7d7f5;
-  margin-bottom: 50px;
+  background: #000000;
+  margin: 0 auto 50px; /* 居中下划线 */
+}
+
+/* Works section */
+.section-title {
+  color: #15267a;
+  margin: 8px 0 18px 0;
+  font-size: 36px;
+  font-weight: 600;
+  text-align: center; /* 标题居中 */
+}
+
+.works {
+  max-width: var(--works-max-width); /* 作品区最大宽度（可调） */
+  margin: 0 auto 40px;              /* 水平居中 */
+}
+
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr); /* 固定每行列数（默认为3列） */
+  gap: var(--card-gap);
+}
+
+.work-card {
+  background: transparent; /* 仅展示图片时背景透明 */
+  border: none;            /* 移除边框 */
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  box-shadow: none;        /* 去掉阴影 */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.work-card:hover {
+  transform: none; /* 悬停不再上浮 */
+  box-shadow: none;
+}
+
+.work-media {
+  display: block;
+  aspect-ratio: var(--card-aspect);
+  background: #f2f5ff;
+  position: relative;
+
+  /* 作品卡片上的光标形态：第三种形态占位 */
+  /* 将 cursor-work.png 换成你专门为作品区域设计的光标 */
+  cursor: url('images/cursor-work.png') 18 12, pointer;
+}
+
+/* placeholder style for cover */
+.media-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #7b8abc;
+}
+
+.work-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 隐藏标题与描述区域 */
+.work-meta {
+  display: none;
+}
+
+.work-title {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #1b2559;
+}
+
+.work-desc {
+  margin: 0;
+  font-size: 13px;
+  color: #5b6aa6;
 }
 
 /* Centered button */
@@ -30,7 +128,10 @@ body {
   border-radius: 10px;
   font-size: 18px;
   color: #15267a;
-  cursor: pointer;
+
+  /* 按钮上的光标形态：请将 cursor-button.png 换成“点击态”图片 */
+  /* 先用 pointer 作为兜底，如果图片加载失败仍然有手指效果 */
+  cursor: url('images/cursor-button.png') 18 12, pointer;
 
   /* Smooth transition to hover state */
   transition: background 0.25s ease, border-color 0.25s ease;
