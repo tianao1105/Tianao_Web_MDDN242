@@ -82,7 +82,7 @@ body {
 
   /* 作品卡片上的光标形态：第三种形态占位 */
   /* 将 cursor-work.png 换成你专门为作品区域设计的光标 */
-  cursor: url('images/cursor-work.png') 18 12, pointer;
+  cursor: url('images/cursor-button.png') 18 12, pointer;
 }
 
 /* placeholder style for cover */
