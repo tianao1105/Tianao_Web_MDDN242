@@ -1,90 +1,135 @@
+/* ════════════════════════════════════════
+   ACCESSIBILITY
+   ════════════════════════════════════════ */
+:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ════════════════════════════════════════
+   DESIGN TOKENS — 在这里调整全局变量
+   ════════════════════════════════════════ */
+:root {
+  --works-max-width: 1000px; /* 作品区最大宽度 */
+  --grid-columns:    3;      /* 每行卡片数量 */
+  --card-gap:        20px;   /* 卡片间距 */
+  --card-aspect:     16 / 9; /* 卡片封面比例 */
+  --card-radius:     20px;   /* 卡片圆角 */
+
+  /* ── 颜色 —— 只需改这里 ── */
+  --bg:              #534d4d75; /* 页面背景色 ← 在这里改背景 */
+  --title-color:     #000000;
+  --section-color:   #15267a;
+  --card-bg:         #f2f5ff;
+  --card-border:     #15267a;
+  --button-bg:       #e0fdff;
+  --button-border:   #c8eaff;
+  --button-color:    #15267a;
+  --button-hover-bg: skyblue;
+  --button-hover-border: mediumPurple;
+
+  /* ── 游戏 UI 颜色 ── */
+  --game-toggle-bg:  #15267a;
+  --hint-bg:         rgba(224, 253, 255, 0.92);
+  --hint-border:     #c8eaff;
+  --hint-color:      #15267a;
+}
+
+/* ════════════════════════════════════════
+   BASE
+   ════════════════════════════════════════ */
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
   padding: 40px;
   font-family: Arial, sans-serif;
-  background: #b3fcf5da;
-
-  /* 自定义鼠标指针：使用 images/cursor.png */
-  /* 如果点击点不合适，可以调整后面的两个数字，例如 16 16 */
+  background: var(--bg);           /* ← 背景色从 --bg 变量读取 */
   cursor: url('images/cursor.png') 18 12, auto;
+  user-select: none;
 }
 
+/* ════════════════════════════════════════
+   LAYOUT
+   ════════════════════════════════════════ */
+header { text-align: center; }
 
-:root {
-  --works-max-width: 1500px;  /* 调整整体区域宽度，影响卡片大小 */
-  --grid-columns: 3;          /* 每行卡片数量 */
-  --card-gap: 20px;           /* 卡片间距 */
-  --card-aspect: 16 / 9;      /* 卡片封面比例 */
-  --card-radius: 20px;        /* 卡片圆角 */
-}
-
-/* Title */
 .title {
-  color: #000000;
+  color: var(--title-color);
   margin-bottom: 4px;
   font-weight: 500;
 }
 
-/* Light underline under the title */
+/* 标题下划线（同时也是游戏第一个平台） */
 .underline {
   width: 200px;
   height: 2px;
-  background: #000000;
-  margin: 0 auto 50px; /* 居中下划线 */
+  background: var(--title-color);
+  margin: 0 auto 50px;
 }
 
-/* Works section */
 .section-title {
-  color: #15267a;
+  color: var(--section-color);
   margin: 8px 0 18px 0;
   font-size: 36px;
   font-weight: 600;
-  text-align: center; /* 标题居中 */
+  text-align: center;
 }
 
+/* ════════════════════════════════════════
+   WORKS GRID
+   ════════════════════════════════════════ */
 .works {
-  max-width: var(--works-max-width); /* 作品区最大宽度（可调） */
-  margin: 0 auto 40px;              /* 水平居中 */
+  max-width: var(--works-max-width);
+  margin: 0 auto 40px;
 }
 
 .works-grid {
   display: grid;
-  grid-template-columns: repeat(var(--grid-columns), 1fr); /* 固定每行列数（默认为3列） */
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
   gap: var(--card-gap);
 }
 
 .work-card {
-  background: transparent; /* 仅展示图片时背景透明 */
-  border: none;            /* 移除边框 */
+  background: transparent;
+  border: none;
   border-radius: var(--card-radius);
   overflow: hidden;
-  box-shadow: none;        /* 去掉阴影 */
+  box-shadow: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .work-card:hover {
-  transform: none; /* 悬停不再上浮 */
+  transform: none;
   box-shadow: none;
 }
 
+/* 卡片媒体区域（border-top = 游戏平台落脚面） */
 .work-media {
   display: block;
   aspect-ratio: var(--card-aspect);
-  background: #f2f5ff;
+  background: var(--card-bg);
   position: relative;
-
-  /* 作品卡片上的光标形态：第三种形态占位 */
-  /* 将 cursor-work.png 换成你专门为作品区域设计的光标 */
+  border-radius: var(--card-radius);
+  border-top:    3px solid var(--card-border);
+  border-left:   1.5px solid rgba(21, 38, 122, 0.2);
+  border-right:  1.5px solid rgba(21, 38, 122, 0.2);
+  border-bottom: 1.5px solid rgba(21, 38, 122, 0.2);
   cursor: url('images/cursor-button.png') 18 12, pointer;
 }
 
-/* placeholder style for cover */
 .media-placeholder {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
   color: #7b8abc;
+  font-size: 14px;
+  letter-spacing: 2px;
 }
 
 .work-media img {
@@ -92,46 +137,106 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: var(--card-radius);
 }
 
-/* 隐藏标题与描述区域 */
-.work-meta {
-  display: none;
-}
+.work-meta  { display: none; }
+.work-title { margin: 0 0 6px; font-size: 16px; color: #1b2559; }
+.work-desc  { margin: 0; font-size: 13px; color: #5b6aa6; }
 
-.work-title {
-  margin: 0 0 6px 0;
-  font-size: 16px;
-  color: #1b2559;
-}
-
-.work-desc {
-  margin: 0;
-  font-size: 13px;
-  color: #5b6aa6;
-}
-
-/* Centered button */
+/* ════════════════════════════════════════
+   MAIN BUTTON（border-top = 游戏平台）
+   ════════════════════════════════════════ */
 .main-button {
   display: block;
-  margin: 150px auto;
+  margin: 80px auto 150px;
   padding: 20px 80px;
-  background: #e0fdff;
-  border: 2px solid #c8eaff;
+  background: var(--button-bg);
+  border-top:    3px solid var(--card-border);
+  border-left:   1.5px solid var(--button-border);
+  border-right:  1.5px solid var(--button-border);
+  border-bottom: 1.5px solid var(--button-border);
   border-radius: 10px;
   font-size: 18px;
-  color: #15267a;
-
-  /* 按钮上的光标形态：请将 cursor-button.png 换成“点击态”图片 */
-  /* 先用 pointer 作为兜底，如果图片加载失败仍然有手指效果 */
+  color: var(--button-color);
   cursor: url('images/cursor-button.png') 18 12, pointer;
-
-  /* Smooth transition to hover state */
   transition: background 0.25s ease, border-color 0.25s ease;
 }
 
-/* Hover effect */
 .main-button:hover {
-  background: skyblue;        /* #87CEEB */
-  border-color: mediumPurple; /* #9370DB */
+  background:    var(--button-hover-bg);
+  border-color:  var(--button-hover-border);
 }
+
+/* ════════════════════════════════════════
+   FOOTER
+   ════════════════════════════════════════ */
+footer { text-align: center; padding: 20px 0; color: #555; }
+
+/* ════════════════════════════════════════
+   GAME OVERLAY
+   ════════════════════════════════════════ */
+
+/* 游戏画布 */
+#game-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; /* 游戏开始后由 JS 改为 auto */
+  z-index: 9999;
+  image-rendering: pixelated;
+}
+
+/* 游戏激活时：恢复默认鼠标 */
+body.game-active,
+body.game-active * {
+  cursor: default !important;
+}
+body.game-active.dragging,
+body.game-active.dragging * {
+  cursor: grabbing !important;
+}
+
+/* PLAY / EXIT 按钮（border-top = 游戏平台） */
+#game-toggle {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  z-index: 10001;
+  background: var(--game-toggle-bg);
+  color: white;
+  border-top:    3px solid rgba(255, 255, 255, 0.6);
+  border-left:   none;
+  border-right:  none;
+  border-bottom: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(21, 38, 122, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+#game-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(21, 38, 122, 0.4);
+}
+
+/* 操作提示条 */
+#controls-hint {
+  position: fixed;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--hint-color);
+  background: var(--hint-bg);
+  border: 1.5px solid var(--hint-border);
+  border-radius: 20px;
+  padding: 7px 18px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  white-space: nowrap;
+}
+#controls-hint.show { opacity: 1; }

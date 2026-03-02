@@ -4,54 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Basic Website</title>
-
-  <!-- Describe your page — shows up in search results and browser tabs -->
   <meta name="description" content="A short description of your page goes here.">
-
-  <!-- Your styles -->
   <link rel="stylesheet" href="styles.css">
-
-  <style>
-    /* Keyboard users need to see where focus is */
-    :focus-visible {
-      outline: 2px solid currentColor;
-      outline-offset: 2px;
-    }
-
-    /* Respect users who prefer less motion */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
 </head>
 <body>
 
-  <header>
-    <h1 class="title">Basic Website</h1>
-  </header>
-
-  <nav aria-label="Primary">
-    <ul>
-      <li><a href="#" aria-current="page">Home</a></li>
-    </ul>
-  </nav>
+  <header><h1 class="title">Basic Website</h1></header>
+  <nav aria-label="Primary"><ul><li><a href="#" aria-current="page">Home</a></li></ul></nav>
 
   <main id="main-content">
-    <div class="underline" aria-hidden="true"></div>
+    <div class="underline" aria-hidden="true" id="underline-el"></div>
 
-    <!-- 作品展示区 -->
     <section class="works" aria-label="作品展示">
       <h2 class="section-title">PROJECT</h2>
       <div class="works-grid">
-        <!-- 作品卡片占位：替换封面图与文字即可 -->
+
+        <!--
+          添加新卡片：复制下方整个 <article> 块粘贴到此处
+          游戏自动识别新卡片顶边/底边为平台，无需改任何 JS
+        -->
+
         <article class="work-card">
           <a href="#" class="work-media" aria-label="PROJECT1">
-            <!-- 用你的图片替换占位元素 -->
             <div class="media-placeholder">IMAGE</div>
-            <!-- <img src="images/work-1.jpg" alt="作品一封面" /> -->
+            <!-- <img src="images/work-1.jpg" alt="作品一" /> -->
           </a>
         </article>
 
@@ -66,30 +42,20 @@
             <div class="media-placeholder">IMAGE</div>
           </a>
         </article>
+
       </div>
     </section>
 
     <button class="main-button" id="myButton" type="button">Button</button>
   </main>
 
-  <footer>
-    <small>&copy; <span id="year"></span> Tianao Wang</small>
-  </footer>
+  <footer><small>&copy; <span id="year"></span> Tianao Wang</small></footer>
 
-  <script>
-    // Keep the copyright year current automatically
-    document.getElementById('year').textContent = new Date().getFullYear();
+  <!-- 游戏图层 -->
+  <canvas id="game-canvas"></canvas>
+  <button id="game-toggle">▶ PLAY</button>
+  <div id="controls-hint">← → MOVE &nbsp;·&nbsp; ↑ JUMP &nbsp;·&nbsp; SPACE(air) FLY &nbsp;·&nbsp; ↓ DROP</div>
 
-    const btn = document.getElementById('myButton');
-    if (btn) {
-      btn.addEventListener('click', () => {
-        alert('Button clicked');
-      });
-    }
-  </script>
-
-  <!-- Your scripts -->
   <script src="script.js"></script>
-
 </body>
 </html>
