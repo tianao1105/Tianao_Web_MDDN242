@@ -21,7 +21,7 @@
   --card-radius:     20px;   /* 卡片圆角 */
 
   /* ── 颜色 —— 只需改这里 ── */
-  --bg:              #534d4d75; /* 页面背景色 ← 在这里改背景 */
+  --bg:              #9d9696da; /* 页面背景色 ← 在这里改背景 */
   --title-color:     #000000;
   --section-color:   #15267a;
   --card-bg:         #f2f5ff;
@@ -240,3 +240,34 @@ body.game-active.dragging * {
   white-space: nowrap;
 }
 #controls-hint.show { opacity: 1; }
+
+/* 下落花朵按钮 */
+#spawn-coin {
+  position: fixed;
+  bottom: 20px; right: 110px;
+  z-index: 10001;
+  background: white;
+  border: 2px solid var(--game-toggle-bg);
+  border-radius: 50%;
+  width: 42px; height: 42px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(21,38,122,0.2);
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: none; /* 游戏激活后才显示 */
+}
+#spawn-coin:hover { transform: translateY(-2px) rotate(15deg); box-shadow: 0 6px 16px rgba(21,38,122,0.3); }
+body.game-active #spawn-coin { display: block; }
+
+/* 右上角花朵计数 */
+#coin-hud {
+  position: fixed;
+  top: 16px; right: 16px;
+  z-index: 10001;
+  display: none;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 200px;
+  justify-content: flex-end;
+}
+body.game-active #coin-hud { display: flex; }

@@ -249,6 +249,47 @@ function update() {
     }
   }
 
+  // 下落花朵物理 + 收集
+  for (const c of fallingCoins) {
+    if (c.collected) continue;
+    // 落地后不再受重力，锁定位置
+    if (c.landed) {
+      c.vy = 0;
+      c.vx = 0;
+    } else {
+      // 重力加速
+      c.vy = Math.min(c.vy + 0.12, 6);
+      c.docX += c.vx;
+      c.docY += c.vy;
+      // 平台碰撞检测
+      for (const p of platforms) {
+        if (p.type === 'floor') continue;
+        const surf        = p.docY;
+        const cBottom     = c.docY + c.r;
+        const cBottomPrev = cBottom - c.vy;
+        const horizOverlap = c.docX > p.docX && c.docX < p.docX + p.w;
+        if (horizOverlap && cBottom >= surf && cBottomPrev <= surf + 10 && c.vy >= 0) {
+          c.docY   = surf - c.r;
+          c.vy     = 0;
+          c.vx     = 0;
+          c.landed = true;
+          break;
+        }
+      }
+    }
+    // 收集检测
+    if (Math.abs(player.docX + player.w / 2 - c.docX) < c.r + 14 &&
+        Math.abs(player.docY + player.h / 2 - c.docY) < c.r + 16) {
+      c.collected = true;
+      collectedCount++;
+      updateCoinHUD();
+      spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#ff4444');
+    }
+    // 落出页面底部自动移除
+    if (c.docY > document.body.scrollHeight + 100) c.collected = true;
+  }
+  fallingCoins = fallingCoins.filter(c => !c.collected);
+
   // 底部 reset
   if (player.docY > document.body.scrollHeight + 150) {
     spawnParticles(
@@ -280,6 +321,39 @@ function spawnParticles(x, y, n, color) {
 }
 
 // ════════════════════════════════════════
+// 下落花朵
+// ════════════════════════════════════════
+let fallingCoins = [];
+let collectedCount = 0;
+
+function updateCoinHUD() {
+  const hud = document.getElementById('coin-hud');
+  if (!hud) return;
+  hud.innerHTML = '';
+  for (let i = 0; i < collectedCount; i++) {
+    const img = document.createElement('img');
+    img.src = 'images/花.png';
+    img.style.cssText = 'width:22px;height:22px;image-rendering:pixelated;';
+    hud.appendChild(img);
+  }
+}
+
+function spawnFallingCoin() {
+  if (!gameActive) return;
+  // 随机 X 在页面宽度内，Y 从视口上方开始（文档坐标）
+  const docX = window.scrollX + Math.random() * window.innerWidth;
+  const docY = window.scrollY - 60; // 从视口上方飞入
+  fallingCoins.push({
+    docX, docY,
+    vy:  1 + Math.random() * 2,     // 下落速度
+    vx: (Math.random() - 0.5) * 1.5, // 轻微左右漂移
+    r:   11,
+    bob: Math.random() * Math.PI * 2,
+    collected: false,
+  });
+}
+
+// ════════════════════════════════════════
 // DRAW
 // ════════════════════════════════════════
 function draw() {
@@ -287,6 +361,7 @@ function draw() {
   if (!gameActive) return;
   const sy = window.scrollY, sx = window.scrollX;
   drawCoins(sy, sx);
+  drawFallingCoins(sy, sx);
   drawPlayer(sy, sx);
   drawParticles();
 }
@@ -302,6 +377,23 @@ function drawCoins(sy, sx) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(COIN_IMG, vx - size / 2, vy + bob - size / 2, size, size);
+    ctx.restore();
+  });
+}
+
+function drawFallingCoins(sy, sx) {
+  fallingCoins.forEach(c => {
+    if (c.collected) return;
+    const vx = c.docX - sx;
+    const vy = c.docY - sy;
+    if (vy < -60 || vy > canvas.height + 60) return;
+    const size = c.r * CONFIG.coinSize;
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    // 轻微旋转让下落更生动
+    ctx.translate(vx, vy);
+    ctx.rotate(Math.sin(frameCount * 0.05 + c.bob) * 0.3);
+    ctx.drawImage(COIN_IMG, -size / 2, -size / 2, size, size);
     ctx.restore();
   });
 }
@@ -449,6 +541,7 @@ document.addEventListener('touchend', () => {
 // 其他
 // ════════════════════════════════════════
 document.getElementById('year').textContent = new Date().getFullYear();
+document.getElementById('spawn-coin').addEventListener('click', spawnFallingCoin);
 document.getElementById('myButton').addEventListener('click', () => {
   if (!gameActive) alert('Button clicked');
 });
