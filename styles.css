@@ -10,13 +10,6 @@ body {
 }
 
 
-
-
-
-
-
-
-
 :root {
   --works-max-width: 1500px;  /* 调整整体区域宽度，影响卡片大小 */
   --grid-columns: 3;          /* 每行卡片数量 */
