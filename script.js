@@ -11,6 +11,9 @@ const FLY_IMG = [new Image(), new Image()];
 FLY_IMG[0].src = 'images/fly-1.png';
 FLY_IMG[1].src = 'images/fly-2.png';
 
+const DRAG_IMG = new Image();
+DRAG_IMG.src = 'images/drag-1.png';
+
 // ════════════════════════════════════════
 // 游戏参数 — 在这里调数值
 // ════════════════════════════════════════
@@ -313,7 +316,7 @@ function drawPlayer(sy, sx) {
   const rw = player.w * CONFIG.playerScale;
   const rh = player.h * CONFIG.playerScale;
   const flyFrame = Math.floor(frameCount / 8) % 2;
-  const img = player.flying ? FLY_IMG[flyFrame] : PLAYER_IMG;
+  const img = dragging ? DRAG_IMG : (player.flying ? FLY_IMG[flyFrame] : PLAYER_IMG);
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   ctx.translate(cx, cy);
