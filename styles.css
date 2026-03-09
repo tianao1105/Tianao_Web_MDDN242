@@ -37,6 +37,9 @@
   --hint-bg:         rgba(224, 253, 255, 0.92);
   --hint-border:     #c8eaff;
   --hint-color:      #15267a;
+
+  /* ── 侧边导航 ── */
+  --nav-w: 130px;
 }
 
 /* ════════════════════════════════════════
@@ -46,9 +49,9 @@
 
 body {
   margin: 0;
-  padding: 40px;
+  padding: 40px 40px 40px calc(var(--nav-w) + 20px); /* 左侧给导航留位 */
   font-family: Arial, sans-serif;
-  background: var(--bg);           /* ← 背景色从 --bg 变量读取 */
+  background: var(--bg);
   cursor: url('images/cursor.png') 18 12, auto;
   user-select: none;
 }
@@ -177,17 +180,15 @@ footer { text-align: center; padding: 20px 0; color: #555; }
    GAME OVERLAY
    ════════════════════════════════════════ */
 
-/* 游戏画布 */
 #game-canvas {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  pointer-events: none; /* 游戏开始后由 JS 改为 auto */
+  pointer-events: none;
   z-index: 9999;
   image-rendering: pixelated;
 }
 
-/* 游戏激活时：恢复默认鼠标 */
 body.game-active,
 body.game-active * {
   cursor: default !important;
@@ -197,7 +198,6 @@ body.game-active.dragging * {
   cursor: grabbing !important;
 }
 
-/* PLAY / EXIT 按钮（border-top = 游戏平台） */
 #game-toggle {
   position: fixed;
   bottom: 20px; right: 20px;
@@ -221,7 +221,6 @@ body.game-active.dragging * {
   box-shadow: 0 6px 16px rgba(21, 38, 122, 0.4);
 }
 
-/* 操作提示条 */
 #controls-hint {
   position: fixed;
   bottom: 20px; left: 50%;
@@ -241,7 +240,6 @@ body.game-active.dragging * {
 }
 #controls-hint.show { opacity: 1; }
 
-/* 下落花朵按钮 */
 #spawn-coin {
   position: fixed;
   bottom: 20px; right: 110px;
@@ -254,12 +252,11 @@ body.game-active.dragging * {
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(21,38,122,0.2);
   transition: transform 0.15s, box-shadow 0.15s;
-  display: none; /* 游戏激活后才显示 */
+  display: none;
 }
 #spawn-coin:hover { transform: translateY(-2px) rotate(15deg); box-shadow: 0 6px 16px rgba(21,38,122,0.3); }
 body.game-active #spawn-coin { display: block; }
 
-/* 右上角花朵计数 */
 #coin-hud {
   position: fixed;
   top: 16px; right: 16px;
@@ -271,3 +268,105 @@ body.game-active #spawn-coin { display: block; }
   justify-content: flex-end;
 }
 body.game-active #coin-hud { display: flex; }
+
+/* ════════════════════════════════════════
+   左侧固定导航
+   ════════════════════════════════════════ */
+.side-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--nav-w);
+  height: 100vh;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  padding: 36px 20px;
+  box-sizing: border-box;
+}
+
+.side-nav-logo {
+  font-family: 'Courier New', monospace;
+  font-size: 40px;
+  letter-spacing: 0.15em;
+  color: var(--title-color);
+  opacity: 0.45;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+  display: block;
+}
+
+.side-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.side-nav a {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--title-color);
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+/* 当前页小圆点 */
+.side-nav a[aria-current="page"]::before {
+  content: '';
+  display: inline-block;
+  width: 16px;   /* ← 调整大小 */
+  height: 16px;
+  background-image: url('images/人物.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.side-nav a:hover,
+.side-nav a[aria-current="page"] {
+  opacity: 1;
+}
+
+/* 游戏激活时导航半透明，不挡操作 */
+body.game-active .side-nav {
+  opacity: 0.12;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+/* 移动端变成顶部横条 */
+@media (max-width: 600px) {
+  body {
+    padding: 0 20px 40px;
+  }
+
+  .side-nav {
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 20px;
+    gap: 20px;
+    background: var(--bg);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .side-nav-logo { margin-bottom: 0; }
+
+  .side-nav ul {
+    flex-direction: row;
+    gap: 16px;
+  }
+}

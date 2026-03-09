@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About – Aokey</title>
+  <meta name="description" content="About Tianao Wang">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../side-nav.css">
+</head>
+<body>
+
+  <nav class="side-nav" aria-label="Primary">
+    <span class="side-nav-logo">Aokey</span>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="index.html" aria-current="page">About</a></li>
+    </ul>
+  </nav>
+
+  <header><h1 class="title">About</h1></header>
+
+  <main id="main-content">
+    <div class="underline" aria-hidden="true"></div>
+
+    <section class="works" aria-label="关于我">
+      <h2 class="section-title">TIANAO WANG</h2>
+      <p style="text-align:center; color: var(--section-color); font-family: 'Courier New', monospace; font-size: 14px; line-height: 2;">
+        介绍
+      </p>
+    </section>
+  </main>
+
+  <footer><small>&copy; <span id="year"></span> Tianao Wang</small></footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
