@@ -83,6 +83,10 @@ function collectPlatforms() {
 
   // ── 平台来源（添加新元素只需在这里 pushEl）──
   pushEl(document.getElementById('underline-el'), 'underline');
+  document.querySelectorAll('.side-nav a').forEach(el => {
+  pushEl(el, 'nav-link');
+});
+pushEl(document.getElementById('game-toggle'), 'toggle');
 
   document.querySelectorAll('.work-media').forEach(el => {
     pushEl(el, 'card');
@@ -101,13 +105,12 @@ function collectPlatforms() {
   });
 
   pushEl(document.getElementById('myButton'),    'button');
-  pushEl(document.getElementById('game-toggle'), 'toggle');
 
   // 兜底地板
-  platforms.push({
+    platforms.push({
     el: null, type: 'floor',
     docX: -500,
-    docY: document.body.scrollHeight + 100,
+    docY: window.scrollY + window.innerHeight - 40, /* ← 视口底部往上40px */
     w:    window.innerWidth + 1000,
     h:    4,
   });
@@ -134,13 +137,16 @@ function collectPlatforms() {
 // fixed 元素每帧同步文档坐标
 function refreshFixedPlatforms() {
   platforms.forEach(p => {
-    if (p.type !== 'toggle' || !p.el) return;
+    if ((p.type !== 'toggle' && p.type !== 'nav-link') || !p.el) return;
     const r = p.el.getBoundingClientRect();
     p.docX = r.left + 8;
     p.docY = r.top + window.scrollY;
     p.w    = r.width - 16;
   });
+  const floor = platforms.find(p => p.type === 'floor');
+  if (floor) floor.docY = window.scrollY + window.innerHeight - 40;
 }
+
 
 function placePlayer() {
   const ul = platforms.find(p => p.type === 'underline');
@@ -245,6 +251,8 @@ function update() {
     if (Math.abs(player.docX + player.w / 2 - c.docX) < c.r + 14 &&
         Math.abs(player.docY + player.h / 2 - c.docY) < c.r + 16) {
       c.collected = true;
+      collectedCount++;        // ← 新增
+      updateCoinHUD();         // ← 新增
       spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#ff4444');
     }
   }
@@ -263,7 +271,7 @@ function update() {
       c.docY += c.vy;
       // 平台碰撞检测
       for (const p of platforms) {
-        if (p.type === 'floor') continue;
+        if (p.type === 'card-bottom') continue;
         const surf        = p.docY;
         const cBottom     = c.docY + c.r;
         const cBottomPrev = cBottom - c.vy;
@@ -286,12 +294,12 @@ function update() {
       spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#ff4444');
     }
     // 落出页面底部自动移除
-    if (c.docY > document.body.scrollHeight + 100) c.collected = true;
+    if (c.docY > window.scrollY + window.innerHeight + 100) c.collected = true;
   }
   fallingCoins = fallingCoins.filter(c => !c.collected);
 
   // 底部 reset
-  if (player.docY > document.body.scrollHeight + 150) {
+  if (player.docY > window.scrollY + window.innerHeight + 200) {
     spawnParticles(
       player.docX - window.scrollX + player.w / 2,
       player.docY - window.scrollY,
@@ -326,11 +334,21 @@ function spawnParticles(x, y, n, color) {
 let fallingCoins = [];
 let collectedCount = 0;
 
-function updateCoinHUD() {
-  const hud = document.getElementById('coin-hud');
+function updateCoinHUD()  {const hud = document.getElementById('coin-hud');
   if (!hud) return;
   hud.innerHTML = '';
-  for (let i = 0; i < collectedCount; i++) {
+
+  const big   = Math.floor(collectedCount / 10); // 大花数量
+  const small = collectedCount % 10;             // 剩余小花
+
+  for (let i = 0; i < big; i++) {
+    const img = document.createElement('img');
+    img.src = 'images/花.png';
+    img.style.cssText = 'width:44px;height:44px;image-rendering:pixelated;';
+    hud.appendChild(img);
+  }
+
+  for (let i = 0; i < small; i++) {
     const img = document.createElement('img');
     img.src = 'images/花.png';
     img.style.cssText = 'width:22px;height:22px;image-rendering:pixelated;';

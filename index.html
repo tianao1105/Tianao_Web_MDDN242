@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- 网页图标 -->
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -21,6 +20,8 @@
       <li><a href="index.html" aria-current="page">Home</a></li>
       <li><a href="about/index.html">About</a></li>
     </ul>
+    <!-- PLAY 按钮移到导航底部 -->
+    <button id="game-toggle">▶ PLAY</button>
   </nav>
 
   <header><h1 class="title">Aokey(Tianao's works)</h1></header>
@@ -29,49 +30,81 @@
     <div class="underline" aria-hidden="true" id="underline-el"></div>
 
     <section class="works" aria-label="作品展示">
-      <h2 class="section-title">PROJECT</h2>
-      <div class="works-grid">
-
-        <!--
-          添加新卡片：复制下方整个 <article> 块粘贴到此处
-          游戏自动识别新卡片顶边/底边为平台，无需改任何 JS
-        -->
-
-        <article class="work-card">
-          <a href="#" class="work-media" aria-label="PROJECT1">
-            <div class="media-placeholder">IMAGE</div>
-            <!-- <img src="images/work-1.jpg" alt="作品一" /> -->
-          </a>
-        </article>
-
-        <article class="work-card">
-          <a href="#" class="work-media" aria-label="PROJECT2">
-            <div class="media-placeholder">IMAGE</div>
-          </a>
-        </article>
-
-        <article class="work-card">
-          <a href="#" class="work-media" aria-label="PROJECT3">
-            <div class="media-placeholder">IMAGE</div>
-          </a>
-        </article>
-
-      </div>
+   
+      <div class="works-grid" id="works-grid"></div>
     </section>
 
-    <button class="main-button" id="myButton" type="button">Button</button>
+   
   </main>
 
   <footer><small>&copy; <span id="year"></span> Tianao Wang</small></footer>
 
+  <!-- 弹出层 -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <img class="modal-img" id="modal-img" src="" alt="" />
+      <h2 class="modal-title" id="modal-title"></h2>
+      <p class="modal-desc" id="modal-desc"></p>
+    </div>
+  </div>
 
   <!-- 游戏图层 -->
   <canvas id="game-canvas"></canvas>
   <div id="coin-hud"></div>
-  <button id="game-toggle">▶ PLAY</button>
   <button id="spawn-coin">🌷</button>
   <div id="controls-hint">← → MOVE &nbsp;·&nbsp; ↑ JUMP &nbsp;·&nbsp; SPACE(air) FLY &nbsp;·&nbsp; ↓ DROP</div>
 
+  <!-- 第一步：加载作品数据 -->
+  <script src="works.js"></script>
+
+  <!-- 第二步：生成卡片 -->
+  <script>
+    const grid = document.getElementById('works-grid');
+    WORKS.forEach(w => {
+      grid.insertAdjacentHTML('beforeend', `
+        <article class="work-card">
+          <a href="#" class="work-media" aria-label="${w.title}"
+             data-modal data-title="${w.title}" data-desc="${w.desc}" data-img="${w.img}">
+            <img src="${w.thumb}" alt="${w.title}" />
+          </a>
+        </article>
+      `);
+    });
+  </script>
+
+  <!-- 第三步：游戏脚本 -->
   <script src="script.js"></script>
+
+  <!-- 第四步：弹出层事件 -->
+  <script>
+    const overlay    = document.getElementById('modal-overlay');
+    const modalImg   = document.getElementById('modal-img');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc  = document.getElementById('modal-desc');
+
+    function openModal(img, title, desc) {
+      modalImg.src           = img;
+      modalImg.alt           = title;
+      modalTitle.textContent = title;
+      modalDesc.textContent  = desc;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-modal]').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        openModal(el.dataset.img, el.dataset.title, el.dataset.desc);
+      });
+    });
+
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+
 </body>
 </html>
