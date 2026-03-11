@@ -16,18 +16,18 @@ const WORKS = [
     title: "Project 1",
     thumb: "images/image1.png",
     img:   "images/image1.png",
-    desc:  "在这里写作品一的介绍。",
+    desc:  "The scene when I first played a game on the game console in my childhood.",
   },
   {
     title: "Project 2",
     thumb: "images/image2.png",
     img:   "images/image2.png",
-    desc:  "在这里写作品二的介绍。",
+    desc:  "DSDN141 project",
   },
   {
     title: "Project 3",
     thumb: "images/image3.png",
     img:   "images/image3.png",
-    desc:  "在这里写作品三的介绍。",
+    desc:  "DSDN141 project",
   },
 ];
