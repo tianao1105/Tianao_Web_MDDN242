@@ -6,7 +6,7 @@ The main idea is to make the web page interactive.
 Elements such as navigation links, card borders and buttons will automatically become platforms that players can jump onto.
 The design of the flower collection system is intended to make people feel like they have achieved something.
 Flowers will automatically appear on the platform, and every time 10 flowers are collected, they will merge into one large flower in the HUD.  
-
+```
 PROJECT/
 ├── index.html           # Main page
 ├── styles.css           # Global styles
@@ -24,7 +24,8 @@ PROJECT/
     ├── navigation.png      # Nav current page indicator
     ├── cursor.png          # Custom cursor
     └── cursor-button.png   # Hover cursor
-    
+
+```
 ## Gameplay
 
 Click the **▶ PLAY** button at the bottom of the sidebar to start.
