@@ -115,7 +115,7 @@ header { text-align: center; }
   position: relative;
   border-radius: var(--card-radius);
   border: none; 
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.4); 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); 
   cursor: url('images/cursor-button.png') 18 12, pointer;
 }
 
