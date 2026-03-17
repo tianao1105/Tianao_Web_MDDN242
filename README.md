@@ -1,51 +1,83 @@
 Aokey — Tianao's Works
 A personal portfolio website featuring mini-games.
-## Design Process
-This is a personal work showcase website. The website and the embedded browser game were designed simultaneously - the page layout and the game world are the same.
-The main idea is to make the web page interactive. 
-Elements such as navigation links, card borders and buttons will automatically become platforms that players can jump onto.
-The design of the flower collection system is intended to make people feel like they have achieved something.
-Flowers will automatically appear on the platform, and every time 10 flowers are collected, they will merge into one large flower in the HUD.  
-```
-PROJECT/
-├── index.html           # Main page
-├── styles.css           # Global styles
-├── script.js            # Game logic
-├── works.js             # Project data
-├── site.webmanifest     # Favicon config
-├── about/
-│   └── index.html       # About page
-└── images/
-    ├── 人物.png            # Player character (idle)
-    ├── fly-1.png           # Player character (fly frame 1)
-    ├── fly-2.png           # Player character (fly frame 2)
-    ├── drag-1.png          # Player character (dragging)
-    ├── 花.png              # Collectible flower
-    ├── navigation.png      # Nav current page indicator
-    ├── cursor.png          # Custom cursor
-    └── cursor-button.png   # Hover cursor
+## Influences & Inspiration
+
+- Classic 2D platformer games — general inspiration for the in-page game mechanic
+- RPG merchant/shop systems — model for the item purchase and coin economy
+- Minimalist portfolio design aesthetic — keeping the layout clean and content-focused
+
+## Design Journal
+
+The starting point for this project was a simple question: what if visiting a portfolio felt like playing a game? Most portfolio websites are static — you scroll, you look, you leave. I wanted something that rewarded curiosity. The idea of embedding a platformer game directly into the page came early, and it shaped almost every design decision that followed.
+
+The core concept was to treat the page itself as a game world. Rather than building a separate game screen, the website's own elements — navigation links, card borders, the PLAY button, the title underline — all become platforms the player can jump on. This meant the layout and the game had to be designed together. Moving a card or adjusting a nav link would change the level. It made the design process feel more like building a world than building a webpage.
+
+A lot of the features that ended up in the final site were not planned from the beginning. Many ideas came from simply sitting with the page and observing — noticing a gap that could become a platform, or a button that felt like it should do something more. The shop system grew out of that kind of exploration. I had been thinking about RPG games, where buying items from a merchant is a familiar and satisfying loop. Coins collected through gameplay could be spent in a shop to unlock visual effects that change how the whole site looks and feels — rain, grass growing on the navigation bar, a repeating coffee grid background. Each item does something slightly absurd, which felt right for a creative portfolio.
+
+The visual style throughout is intentionally minimal. A clean layout with a restrained colour palette keeps the focus on the work itself. The game elements are layered on top without overwhelming the content — the character is small, the effects are subtle until you choose to activate them. This balance between calm and playful is something I kept returning to throughout the process.
+
+Photography became its own section during development, a separate space from the design projects. Adding it felt natural — the same grid layout, the same popup interaction — but with a different tone. Where the project cards show made things, the photo grid shows seen things.
+
+Looking back, the most interesting part of this process was how the constraints of a real webpage — fixed navigation, scroll behaviour, DOM elements with actual positions — became creative material rather than limitations. The game had to work within the page, not despite it.
+## Project Structure
 
 ```
+├── index.html              # Home page
+├── shop.html               # Shop page
+├── photography.html        # Photography page
+├── about/
+│   └── index.html          # About page
+├── styles.css              # Global styles
+├── script.js               # Game engine
+├── shopEffects.js          # Shop item effects (runs on all pages)
+├── works.js                # Home project data
+├── photography_works.js    # Photography page data
+├── images/
+│   ├── 人物.png             # Player character (idle)
+│   ├── fly-1.png           # Player character (fly frame 1)
+│   ├── fly-2.png           # Player character (fly frame 2)
+│   ├── drag-1.png          # Player character (dragging)
+│   ├── coin_gif.gif        # Collectible coin
+│   ├── insert_coins.gif    # Coin spawn button
+│   ├── shop_market.gif     # Shop market building
+│   ├── Showcase.png        # Shop showcase unit
+│   ├── item_1.png          # Shop item: Mysterious Water
+│   ├── item_2.png          # Shop item: Invisible Grass
+│   ├── item_3.png          # Shop item: Cat Cat Coffee
+│   ├── image1.png          # Portfolio project 1
+│   ├── image2.png          # Portfolio project 2
+│   ├── image3.png          # Portfolio project 3
+│   └── 1.png               # That's ME.
+└── photo/
+    ├── photo_1.jpg         # Photography 1
+    ├── ...
+    └── photo_9.jpg         # Photography 9
+```
+
 ## Gameplay
 
-Click the **▶ PLAY** button at the bottom of the sidebar to start.
+Click **▶ PLAY** in the sidebar to start.
 
 | Key | Action |
 |-----|--------|
 | `← →` or `A D` | Move left / right |
-| `↑` or `W` or `Space` | Jump |
-| `Space` | Fly |
+| `↑` or `W` | Jump |
+| `Space` (in air) | Fly |
 | `↓` or `S` | Drop through platform |
 | Mouse drag | Drag character directly |
 
-Click the **🌷** button to drop flowers from above. 
-Collected flowers appear in the top-right corner — **every 10 flowers merge into one big flower**.
+Hold the coin button to drop coins from above — collect them by walking into them. Coin count is saved across pages.
 
-The following page elements automatically become platforms:
+Visit the **Shop** page to spend coins on items that change how the site looks and feels.
+
+Page elements that become platforms:
 - Title underline
 - Sidebar navigation links
-- Project card top / bottom edges
+- Project card edges
 - PLAY button
 
-## AI Usage Instructions
-With the assistance of Claude Code AI, all the decision-making designs were independently decided by myself.
+## AI Collaboration
+
+I used Claude Code to help write and implement code throughout this project. All ideas and design decisions were my own — the AI translated them into working code.
+
+I would describe what I wanted, and Claude would implement it. Without this, many technical features (the platformer physics, localStorage persistence, the shop proximity system) would have been beyond my current coding ability. AI made it possible to build what I could imagine but not yet write.

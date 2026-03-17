@@ -238,12 +238,11 @@ body.game-active #spawn-coin { display: flex; }
   display: none;
   align-items: center;
   gap: 8px;
-  background: rgba(224, 253, 255, 0.88);
-  border: 1.5px solid var(--hint-border);
-  border-radius: 20px;
-  padding: 5px 12px 5px 8px;
+  background: none;
+  border: none;
+  padding: 0;
 }
-body.game-active #coin-hud { display: flex; }
+#coin-hud.has-coins { display: flex; }
 
 #coin-count {
   font-family: 'Pixelify Sans', sans-serif;

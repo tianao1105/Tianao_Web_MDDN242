@@ -1,5 +1,5 @@
 // ════════════════════════════════════════
-// 图片资源 — 修改路径即可换图
+// Image assets
 // ════════════════════════════════════════
 const PLAYER_IMG = new Image();
 PLAYER_IMG.src = 'images/人物.png';
@@ -15,22 +15,22 @@ const DRAG_IMG = new Image();
 DRAG_IMG.src = 'images/drag-1.png';
 
 // ════════════════════════════════════════
-// 游戏参数 — 在这里调数值
+// Game config
 // ════════════════════════════════════════
 const CONFIG = {
-  playerSpeed:   4.2,   // 移动速度（越大越快）
-  jumpForce:    -8,      // 跳跃力（越小跳越高，注意是负数）
-  gravity:       0.35,  // 重力（越大下落越快）
-  flyGravity:    0.08,  // 飞行时的重力
-  flyMaxUp:     -4,     // 飞行上升最大速度
-  playerScale:   1.8,   // 人物渲染倍数（越大人物越大）
-  coinSize:      3.2,   // 花朵渲染倍数
-  platformPad:   28,    // 平台两侧缩短的像素
-  feetY:         0.75,  // 脚部在精灵图中的位置比例（0=顶部, 1=底部）
+  playerSpeed:   4.2,   // movement speed
+  jumpForce:    -8,      // jump force (negative = upward)
+  gravity:       0.35,  // gravity
+  flyGravity:    0.08,  // gravity while flying
+  flyMaxUp:     -4,     // max upward speed while flying
+  playerScale:   1.8,   // player render scale
+  coinSize:      3.2,   // coin render scale
+  platformPad:   28,    // platform edge inset (px)
+  feetY:         0.75,  // feet anchor ratio in sprite (0=top, 1=bottom)
 };
 
 // ════════════════════════════════════════
-// 画布 & 状态
+// Canvas & state
 // ════════════════════════════════════════
 const canvas = document.getElementById('game-canvas');
 const ctx    = canvas.getContext('2d');
@@ -58,7 +58,7 @@ let dragOffX = 0, dragOffY = 0;
 function resizeCanvas() {
   const w = window.innerWidth;
   const h = window.innerHeight;
-  // 缓冲区与 CSS 显示尺寸同时设置，保证 1:1，不产生拉伸
+  // Match buffer to CSS size for 1:1 pixel ratio
   canvas.width        = w;
   canvas.height       = h;
   canvas.style.width  = w + 'px';
@@ -66,7 +66,7 @@ function resizeCanvas() {
 }
 
 // ════════════════════════════════════════
-// 平台初始化（游戏开始时调用一次）
+// Platform init (called once on game start)
 // ════════════════════════════════════════
 function collectPlatforms() {
   platforms = [];
@@ -87,16 +87,16 @@ function collectPlatforms() {
     });
   }
 
-  // ── 平台来源（添加新元素只需在这里 pushEl）──
+  // Platform sources
   pushEl(document.getElementById('underline-el'), 'underline');
   document.querySelectorAll('.side-nav a').forEach(el => {
-  pushEl(el, 'nav-link');
-});
-pushEl(document.getElementById('game-toggle'), 'toggle');
+    pushEl(el, 'nav-link');
+  });
+  pushEl(document.getElementById('game-toggle'), 'toggle');
 
   document.querySelectorAll('.work-media').forEach(el => {
     pushEl(el, 'card');
-    // 卡片底边
+    // card bottom edge
     const r   = el.getBoundingClientRect();
     const cs  = getComputedStyle(el);
     const bb  = parseFloat(cs.borderBottomWidth) || 1.5;
@@ -110,26 +110,24 @@ pushEl(document.getElementById('game-toggle'), 'toggle');
     });
   });
 
-  pushEl(document.getElementById('myButton'),    'button');
-
-  // 商店页面自定义平台
+  // Shop page custom platforms
   document.querySelectorAll('.shop-platform').forEach(el => {
     pushEl(el, 'shop-platform');
   });
 
-  // 兜底地板
-    platforms.push({
+  // Fallback floor
+  platforms.push({
     el: null, type: 'floor',
     docX: -500,
-    docY: window.scrollY + window.innerHeight - 40, /* ← 视口底部往上40px */
+    docY: window.scrollY + window.innerHeight - 40,
     w:    window.innerWidth + 1000,
     h:    4,
   });
 
-  // ── 花朵（自动分布在各平台上方）──
+  // Coins (auto-distributed above each platform)
   platforms.forEach((p, idx) => {
     if (p.type === 'floor' || p.type === 'toggle' || p.type === 'card-bottom') return;
-    const count = p.type === 'card' ? 3 : (p.type === 'button' ? 2 : 1);
+    const count = p.type === 'card' ? 3 : 1;
     for (let i = 0; i < count; i++) {
       const t = (i + 0.5) / count;
       coins.push({
@@ -145,11 +143,11 @@ pushEl(document.getElementById('game-toggle'), 'toggle');
   });
 }
 
-// 每帧同步所有平台的文档坐标（支持窗口缩放 / 滚动实时更新）
+// Sync platform positions every frame (supports resize/scroll)
 function refreshFixedPlatforms() {
   platforms.forEach(p => {
     if (!p.el) {
-      // 兜底地板跟随视口底部和宽度
+      // Floor follows viewport bottom
       if (p.type === 'floor') {
         p.docX = -500;
         p.docY = window.scrollY + window.innerHeight - 40;
@@ -161,13 +159,13 @@ function refreshFixedPlatforms() {
     const pad = p.type === 'toggle' ? 8 : p.type === 'shop-platform' ? 0 : CONFIG.platformPad;
     p.docX = r.left + pad;
     p.w    = r.width - pad * 2;
-    // card-bottom 取元素底边，其余取顶边
+    // card-bottom uses element bottom, others use top
     p.docY = p.type === 'card-bottom'
       ? r.bottom + window.scrollY
       : r.top    + window.scrollY;
   });
 
-  // 花朵跟随平台实时移动
+  // Coins follow platforms
   coins.forEach(c => {
     if (c.collected) return;
     const p = platforms[c.platIdx];
@@ -185,7 +183,7 @@ function placePlayer() {
     player.docX = ul.docX + ul.w / 2 - player.w / 2;
     player.docY = ul.docY - player.h;
   } else if (sp) {
-    player.docX = sp.docX + 20;   // left end of the road
+    player.docX = sp.docX + 20;
     player.docY = sp.docY - player.h;
   } else {
     player.docX = 80;
@@ -211,12 +209,12 @@ function update() {
   const flying = keys[' '] && !player.onGround;
   player.flying = flying;
 
-  // 横向移动
+  // Horizontal movement
   if      (keys['ArrowLeft']  || keys['a']) { player.vx = -spd; player.facing = -1; }
   else if (keys['ArrowRight'] || keys['d']) { player.vx =  spd; player.facing =  1; }
   else                                       { player.vx *= 0.75; }
 
-  // 跳跃
+  // Jump
   if ((keys['ArrowUp'] || keys[' '] || keys['w']) && player.onGround) {
     player.vy = jumpV;
     player.onGround = false;
@@ -227,7 +225,7 @@ function update() {
     );
   }
 
-  // 飞行
+  // Fly
   if (flying) {
     player.vy = Math.max(player.vy - 1.2, flyMaxUp);
     if (frameCount % 3 === 0) {
@@ -239,7 +237,7 @@ function update() {
     }
   }
 
-  // 下跳
+  // Drop through platform
   const dropDown = (keys['ArrowDown'] || keys['s']) && player.onGround;
   if (dropDown) {
     player.docY += 8;
@@ -247,14 +245,14 @@ function update() {
     player.vy = 2;
   }
 
-  // 重力
+  // Gravity
   const effectiveGrav = flying ? flyGravity : grav;
   player.vy = Math.min(player.vy + effectiveGrav, 18);
   player.docX += player.vx;
   player.docY += player.vy;
   player.onGround = false;
 
-  // 碰撞检测
+  // Collision detection
   if (!dropDown) {
     for (const p of platforms) {
       const surf        = p.docY;
@@ -271,7 +269,7 @@ function update() {
     }
   }
 
-  // 视口四周边界约束（窗口缩小时也会把玩家推回可见区域）
+  // Viewport boundary clamp
   const boundLeft   = window.scrollX;
   const boundRight  = window.scrollX + window.innerWidth  - player.w;
   const boundTop    = window.scrollY;
@@ -281,7 +279,7 @@ function update() {
   if (player.docY < boundTop)    { player.docY = boundTop;    if (player.vy < 0) player.vy = 0; }
   if (player.docY > boundBottom) { player.docY = boundBottom; if (player.vy > 0) player.vy = 0; player.onGround = true; }
 
-  // 走路动画
+  // Walk animation
   if (player.onGround && Math.abs(player.vx) > 0.5) {
     player.walkTimer++;
     if (player.walkTimer > 8) player.walkTimer = 0;
@@ -289,37 +287,37 @@ function update() {
     player.walkTimer = 0;
   }
 
-  // 彩虹尾巴 (shop item)
+  // Rainbow trail (shop item)
   if (window._shopRainbow) {
     rainbowTrail.push({ x: player.docX + player.w / 2, y: player.docY + player.h / 2, life: 1 });
     if (rainbowTrail.length > 40) rainbowTrail.shift();
   }
 
-  // 收集花朵
+  // Collect coins
   for (const c of coins) {
     if (c.collected) continue;
     if (Math.abs(player.docX + player.w / 2 - c.docX) < c.r + 14 &&
         Math.abs(player.docY + player.h / 2 - c.docY) < c.r + 16) {
       c.collected = true;
-      collectedCount++;        // ← 新增
-      updateCoinHUD();         // ← 新增
+      collectedCount++;
+      updateCoinHUD();
       spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#ff4444');
     }
   }
 
-  // 下落花朵物理 + 收集
+  // Falling coin physics + collection
   for (const c of fallingCoins) {
     if (c.collected) continue;
-    // 落地后不再受重力，锁定位置
+    // Locked once landed
     if (c.landed) {
       c.vy = 0;
       c.vx = 0;
     } else {
-      // 重力加速
+      // Gravity acceleration
       c.vy = Math.min(c.vy + 0.12, 6);
       c.docX += c.vx;
       c.docY += c.vy;
-      // 平台碰撞检测
+      // Platform collision
       for (const p of platforms) {
         if (p.type === 'card-bottom') continue;
         const surf        = p.docY;
@@ -335,7 +333,7 @@ function update() {
         }
       }
     }
-    // 收集检测
+    // Collection check
     if (Math.abs(player.docX + player.w / 2 - c.docX) < c.r + 14 &&
         Math.abs(player.docY + player.h / 2 - c.docY) < c.r + 16) {
       c.collected = true;
@@ -343,12 +341,12 @@ function update() {
       updateCoinHUD();
       spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#ff4444');
     }
-    // 落出页面底部自动移除
+    // Remove if below viewport
     if (c.docY > window.scrollY + window.innerHeight + 100) c.collected = true;
   }
   fallingCoins = fallingCoins.filter(c => !c.collected);
 
-  // 底部 reset
+  // Respawn if player falls off bottom
   if (player.docY > window.scrollY + window.innerHeight + 200) {
     spawnParticles(
       player.docX - window.scrollX + player.w / 2,
@@ -359,7 +357,7 @@ function update() {
     player.invincible = 60;
   }
 
-  // 粒子
+  // Particles
   particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--; });
   particles = particles.filter(p => p.life > 0);
 }
@@ -379,7 +377,7 @@ function spawnParticles(x, y, n, color) {
 }
 
 // ════════════════════════════════════════
-// 下落花朵
+// Falling coins
 // ════════════════════════════════════════
 let fallingCoins = [];
 let collectedCount = parseInt(localStorage.getItem('coinCount') || '0', 10);
@@ -394,17 +392,18 @@ function updateCoinHUD() {
          style="width:28px;height:28px;image-rendering:pixelated;flex-shrink:0;" />
     <span id="coin-count">×${collectedCount}</span>
   `;
+  if (collectedCount > 0) hud.classList.add('has-coins');
+  else hud.classList.remove('has-coins');
 }
 
 function spawnFallingCoin() {
   if (!gameActive) return;
-  // 随机 X 在页面宽度内，Y 从视口上方开始（文档坐标）
   const docX = window.scrollX + Math.random() * window.innerWidth;
-  const docY = window.scrollY - 60; // 从视口上方飞入
+  const docY = window.scrollY - 60;
   fallingCoins.push({
     docX, docY,
-    vy:  1 + Math.random() * 2,     // 下落速度
-    vx: (Math.random() - 0.5) * 1.5, // 轻微左右漂移
+    vy:  1 + Math.random() * 2,
+    vx: (Math.random() - 0.5) * 1.5,
     r:   11,
     bob: Math.random() * Math.PI * 2,
     collected: false,
@@ -440,7 +439,6 @@ function drawRainbowTrail(sy, sx) {
     ctx.fill();
     ctx.restore();
   });
-  // remove dead particles
   for (let i = rainbowTrail.length - 1; i >= 0; i--) {
     if (rainbowTrail[i].life <= 0) rainbowTrail.splice(i, 1);
   }
@@ -454,7 +452,7 @@ function drawCoins(sy, sx) {
     if (vy < -40 || vy > canvas.height + 40) return;
     const bob   = Math.sin(frameCount * 0.06 + c.bob) * 4;
     const size  = c.r * CONFIG.coinSize;
-    const spinX = Math.cos(frameCount * 0.08 + c.bob); // X轴缩放模拟硬币自旋
+    const spinX = Math.cos(frameCount * 0.08 + c.bob); // simulate coin spin via X scale
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.translate(vx, vy + bob);
@@ -473,7 +471,6 @@ function drawFallingCoins(sy, sx) {
     const size = c.r * CONFIG.coinSize;
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    // 轻微旋转让下落更生动
     ctx.translate(vx, vy);
     ctx.rotate(Math.sin(frameCount * 0.05 + c.bob) * 0.3);
     ctx.drawImage(COIN_IMG, -size / 2, -size / 2, size, size);
@@ -487,7 +484,7 @@ function drawPlayer(sy, sx) {
   const vx = player.docX - sx;
   const vy = player.docY - sy;
   const cx = vx + player.w / 2;
-  const cy = vy + player.h;       // anchor at hitbox bottom (feet)
+  const cy = vy + player.h;
   const rw = player.w * CONFIG.playerScale;
   const rh = player.h * CONFIG.playerScale;
   const flyFrame = Math.floor(frameCount / 8) % 2;
@@ -497,7 +494,7 @@ function drawPlayer(sy, sx) {
   ctx.translate(cx, cy);
   if (player.facing === -1) ctx.scale(-1, 1);
   if (Math.abs(player.vx) > 1 && player.onGround) ctx.rotate(player.vx * 0.008);
-  ctx.drawImage(img, -rw / 2, -CONFIG.feetY * rh, rw, rh); // anchor visual feet to ground
+  ctx.drawImage(img, -rw / 2, -CONFIG.feetY * rh, rw, rh);
   ctx.restore();
 }
 
@@ -512,7 +509,7 @@ function drawParticles() {
 }
 
 // ════════════════════════════════════════
-// 游戏循环
+// Game loop
 // ════════════════════════════════════════
 function gameLoop() {
   update();
@@ -521,7 +518,7 @@ function gameLoop() {
 }
 
 // ════════════════════════════════════════
-// 开始 / 退出
+// Start / Exit
 // ════════════════════════════════════════
 const toggleBtn = document.getElementById('game-toggle');
 const hint      = document.getElementById('controls-hint');
@@ -551,7 +548,7 @@ toggleBtn.addEventListener('click', () => {
 });
 
 // ════════════════════════════════════════
-// 拖拽角色
+// Drag player
 // ════════════════════════════════════════
 function isOverPlayer(clientX, clientY) {
   const px = player.docX - window.scrollX;
@@ -591,7 +588,7 @@ window.addEventListener('mouseup', () => {
 });
 
 // ════════════════════════════════════════
-// 键盘输入
+// Keyboard input
 // ════════════════════════════════════════
 document.addEventListener('keydown', e => {
   if (!gameActive) return;
@@ -601,7 +598,7 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keyup', e => { keys[e.key] = false; });
 
 // ════════════════════════════════════════
-// 移动端触摸
+// Mobile touch
 // ════════════════════════════════════════
 let touchStartX = 0;
 document.addEventListener('touchstart', e => {
@@ -621,20 +618,36 @@ document.addEventListener('touchend', () => {
 });
 
 // ════════════════════════════════════════
-// 其他
+// Init
 // ════════════════════════════════════════
 document.getElementById('year').textContent = new Date().getFullYear();
-document.getElementById('spawn-coin').addEventListener('click', spawnFallingCoin);
-document.getElementById('myButton').addEventListener('click', () => {
-  if (!gameActive) alert('Button clicked');
-});
+updateCoinHUD(); // Show existing coins immediately on load
+
+// Hold to continuously spawn coins
+(function () {
+  const btn = document.getElementById('spawn-coin');
+  let holdTimer = null;
+  function startHold() {
+    spawnFallingCoin();
+    holdTimer = setInterval(spawnFallingCoin, 80);
+  }
+  function stopHold() {
+    clearInterval(holdTimer);
+    holdTimer = null;
+  }
+  btn.addEventListener('mousedown', startHold);
+  btn.addEventListener('mouseup',   stopHold);
+  btn.addEventListener('mouseleave', stopHold);
+  btn.addEventListener('touchstart', e => { e.preventDefault(); startHold(); }, { passive: false });
+  btn.addEventListener('touchend',   stopHold);
+}());
 
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     resizeCanvas();
-    // collectPlatforms 重新计算花朵在新卡片宽度下的 relX，不重置玩家位置
+    // Recalculate coin positions without resetting player
     if (gameActive) collectPlatforms();
   }, 150);
 });

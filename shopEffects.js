@@ -68,17 +68,17 @@
       top: -120px; left: -120px;
       display: flex;
       flex-wrap: wrap;
-      animation: coffeeDiag 5s linear infinite;
+      animation: coffeeDiag 2s linear infinite;
     }
     @keyframes coffeeDiag {
       from { transform: translate(0, 0); }
       to   { transform: translate(120px, 120px); }
     }
     .coffee-cup {
-      opacity: 0.18;
+      opacity: 0.5;
       width: 120px; height: 120px;
       display: flex; align-items: center; justify-content: center;
-      transform: rotate(-30deg);
+      transform: rotate(-55deg);
       flex-shrink: 0;
     }
     .coffee-cup img {

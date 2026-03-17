@@ -159,11 +159,10 @@
       background: none;
       color: var(--title-color);
       border: 1.5px solid rgba(21, 38, 122, 0.35);
-      border-radius: 50px;
-      padding: 6px 14px;
-      font-family: inherit;
-      font-size: 11px;
-      letter-spacing: 0.08em;
+      border-radius: 50%;
+      width: 56px; height: 56px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
       cursor: pointer;
       transition: transform 0.15s, box-shadow 0.15s;
     }
@@ -190,7 +189,7 @@
       <button id="spawn-coin">
         <img src="images/insert_coins.gif" alt="Spawn coin" />
       </button>
-      <button id="shop-reset">↺ RESET</button>
+      <button id="shop-reset">↺</button>
       <button id="game-toggle">▶ PLAY</button>
     </div>
   </nav>
