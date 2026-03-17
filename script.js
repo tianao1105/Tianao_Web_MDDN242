@@ -5,7 +5,7 @@ const PLAYER_IMG = new Image();
 PLAYER_IMG.src = 'images/人物.png';
 
 const COIN_IMG = new Image();
-COIN_IMG.src = 'images/花.png';
+COIN_IMG.src = 'images/coin_gif.gif';
 
 const FLY_IMG = [new Image(), new Image()];
 FLY_IMG[0].src = 'images/fly-1.png';
@@ -26,6 +26,7 @@ const CONFIG = {
   playerScale:   1.8,   // 人物渲染倍数（越大人物越大）
   coinSize:      3.2,   // 花朵渲染倍数
   platformPad:   28,    // 平台两侧缩短的像素
+  feetY:         0.75,  // 脚部在精灵图中的位置比例（0=顶部, 1=底部）
 };
 
 // ════════════════════════════════════════
@@ -55,8 +56,13 @@ let dragging = false;
 let dragOffX = 0, dragOffY = 0;
 
 function resizeCanvas() {
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  // 缓冲区与 CSS 显示尺寸同时设置，保证 1:1，不产生拉伸
+  canvas.width        = w;
+  canvas.height       = h;
+  canvas.style.width  = w + 'px';
+  canvas.style.height = h + 'px';
 }
 
 // ════════════════════════════════════════
@@ -71,7 +77,7 @@ function collectPlatforms() {
     const r   = el.getBoundingClientRect();
     const cs  = getComputedStyle(el);
     const bt  = parseFloat(cs.borderTopWidth) || 2;
-    const pad = type === 'toggle' ? 8 : CONFIG.platformPad;
+    const pad = type === 'toggle' ? 8 : type === 'shop-platform' ? 0 : CONFIG.platformPad;
     platforms.push({
       el, type,
       docX: r.left + pad,
@@ -106,6 +112,11 @@ pushEl(document.getElementById('game-toggle'), 'toggle');
 
   pushEl(document.getElementById('myButton'),    'button');
 
+  // 商店页面自定义平台
+  document.querySelectorAll('.shop-platform').forEach(el => {
+    pushEl(el, 'shop-platform');
+  });
+
   // 兜底地板
     platforms.push({
     el: null, type: 'floor',
@@ -134,25 +145,48 @@ pushEl(document.getElementById('game-toggle'), 'toggle');
   });
 }
 
-// fixed 元素每帧同步文档坐标
+// 每帧同步所有平台的文档坐标（支持窗口缩放 / 滚动实时更新）
 function refreshFixedPlatforms() {
   platforms.forEach(p => {
-    if ((p.type !== 'toggle' && p.type !== 'nav-link') || !p.el) return;
-    const r = p.el.getBoundingClientRect();
-    p.docX = r.left + 8;
-    p.docY = r.top + window.scrollY;
-    p.w    = r.width - 16;
+    if (!p.el) {
+      // 兜底地板跟随视口底部和宽度
+      if (p.type === 'floor') {
+        p.docX = -500;
+        p.docY = window.scrollY + window.innerHeight - 40;
+        p.w    = window.innerWidth + 1000;
+      }
+      return;
+    }
+    const r   = p.el.getBoundingClientRect();
+    const pad = p.type === 'toggle' ? 8 : p.type === 'shop-platform' ? 0 : CONFIG.platformPad;
+    p.docX = r.left + pad;
+    p.w    = r.width - pad * 2;
+    // card-bottom 取元素底边，其余取顶边
+    p.docY = p.type === 'card-bottom'
+      ? r.bottom + window.scrollY
+      : r.top    + window.scrollY;
   });
-  const floor = platforms.find(p => p.type === 'floor');
-  if (floor) floor.docY = window.scrollY + window.innerHeight - 40;
+
+  // 花朵跟随平台实时移动
+  coins.forEach(c => {
+    if (c.collected) return;
+    const p = platforms[c.platIdx];
+    if (!p) return;
+    c.docX = p.docX + c.relX;
+    c.docY = p.docY + c.relY;
+  });
 }
 
 
 function placePlayer() {
   const ul = platforms.find(p => p.type === 'underline');
+  const sp = platforms.find(p => p.type === 'shop-platform');
   if (ul) {
     player.docX = ul.docX + ul.w / 2 - player.w / 2;
     player.docY = ul.docY - player.h;
+  } else if (sp) {
+    player.docX = sp.docX + 20;   // left end of the road
+    player.docY = sp.docY - player.h;
   } else {
     player.docX = 80;
     player.docY = 200;
@@ -237,12 +271,28 @@ function update() {
     }
   }
 
+  // 视口四周边界约束（窗口缩小时也会把玩家推回可见区域）
+  const boundLeft   = window.scrollX;
+  const boundRight  = window.scrollX + window.innerWidth  - player.w;
+  const boundTop    = window.scrollY;
+  const boundBottom = window.scrollY + window.innerHeight - player.h;
+  if (player.docX < boundLeft)   { player.docX = boundLeft;   if (player.vx < 0) player.vx = 0; }
+  if (player.docX > boundRight)  { player.docX = boundRight;  if (player.vx > 0) player.vx = 0; }
+  if (player.docY < boundTop)    { player.docY = boundTop;    if (player.vy < 0) player.vy = 0; }
+  if (player.docY > boundBottom) { player.docY = boundBottom; if (player.vy > 0) player.vy = 0; player.onGround = true; }
+
   // 走路动画
   if (player.onGround && Math.abs(player.vx) > 0.5) {
     player.walkTimer++;
     if (player.walkTimer > 8) player.walkTimer = 0;
   } else {
     player.walkTimer = 0;
+  }
+
+  // 彩虹尾巴 (shop item)
+  if (window._shopRainbow) {
+    rainbowTrail.push({ x: player.docX + player.w / 2, y: player.docY + player.h / 2, life: 1 });
+    if (rainbowTrail.length > 40) rainbowTrail.shift();
   }
 
   // 收集花朵
@@ -332,28 +382,18 @@ function spawnParticles(x, y, n, color) {
 // 下落花朵
 // ════════════════════════════════════════
 let fallingCoins = [];
-let collectedCount = 0;
+let collectedCount = parseInt(localStorage.getItem('coinCount') || '0', 10);
+let rainbowTrail = [];
 
-function updateCoinHUD()  {const hud = document.getElementById('coin-hud');
+function updateCoinHUD() {
+  localStorage.setItem('coinCount', collectedCount);
+  const hud = document.getElementById('coin-hud');
   if (!hud) return;
-  hud.innerHTML = '';
-
-  const big   = Math.floor(collectedCount / 10); // 大花数量
-  const small = collectedCount % 10;             // 剩余小花
-
-  for (let i = 0; i < big; i++) {
-    const img = document.createElement('img');
-    img.src = 'images/花.png';
-    img.style.cssText = 'width:44px;height:44px;image-rendering:pixelated;';
-    hud.appendChild(img);
-  }
-
-  for (let i = 0; i < small; i++) {
-    const img = document.createElement('img');
-    img.src = 'images/花.png';
-    img.style.cssText = 'width:22px;height:22px;image-rendering:pixelated;';
-    hud.appendChild(img);
-  }
+  hud.innerHTML = `
+    <img src="images/coin_gif.gif"
+         style="width:28px;height:28px;image-rendering:pixelated;flex-shrink:0;" />
+    <span id="coin-count">×${collectedCount}</span>
+  `;
 }
 
 function spawnFallingCoin() {
@@ -378,10 +418,32 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (!gameActive) return;
   const sy = window.scrollY, sx = window.scrollX;
+  drawRainbowTrail(sy, sx);
   drawCoins(sy, sx);
   drawFallingCoins(sy, sx);
   drawPlayer(sy, sx);
   drawParticles();
+}
+
+function drawRainbowTrail(sy, sx) {
+  if (!window._shopRainbow || rainbowTrail.length === 0) return;
+  const hueStep = 360 / rainbowTrail.length;
+  rainbowTrail.forEach((pt, i) => {
+    pt.life -= 0.03;
+    if (pt.life <= 0) return;
+    const radius = 6 * pt.life;
+    ctx.save();
+    ctx.globalAlpha = pt.life * 0.7;
+    ctx.beginPath();
+    ctx.arc(pt.x - sx, pt.y - sy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = `hsl(${(hueStep * i + frameCount * 3) % 360}, 100%, 60%)`;
+    ctx.fill();
+    ctx.restore();
+  });
+  // remove dead particles
+  for (let i = rainbowTrail.length - 1; i >= 0; i--) {
+    if (rainbowTrail[i].life <= 0) rainbowTrail.splice(i, 1);
+  }
 }
 
 function drawCoins(sy, sx) {
@@ -390,11 +452,14 @@ function drawCoins(sy, sx) {
     const vx = c.docX - sx;
     const vy = c.docY - sy;
     if (vy < -40 || vy > canvas.height + 40) return;
-    const bob  = Math.sin(frameCount * 0.06 + c.bob) * 4;
-    const size = c.r * CONFIG.coinSize;
+    const bob   = Math.sin(frameCount * 0.06 + c.bob) * 4;
+    const size  = c.r * CONFIG.coinSize;
+    const spinX = Math.cos(frameCount * 0.08 + c.bob); // X轴缩放模拟硬币自旋
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(COIN_IMG, vx - size / 2, vy + bob - size / 2, size, size);
+    ctx.translate(vx, vy + bob);
+    ctx.scale(spinX, 1);
+    ctx.drawImage(COIN_IMG, -size / 2, -size / 2, size, size);
     ctx.restore();
   });
 }
@@ -422,7 +487,7 @@ function drawPlayer(sy, sx) {
   const vx = player.docX - sx;
   const vy = player.docY - sy;
   const cx = vx + player.w / 2;
-  const cy = vy + player.h / 2;
+  const cy = vy + player.h;       // anchor at hitbox bottom (feet)
   const rw = player.w * CONFIG.playerScale;
   const rh = player.h * CONFIG.playerScale;
   const flyFrame = Math.floor(frameCount / 8) % 2;
@@ -432,7 +497,7 @@ function drawPlayer(sy, sx) {
   ctx.translate(cx, cy);
   if (player.facing === -1) ctx.scale(-1, 1);
   if (Math.abs(player.vx) > 1 && player.onGround) ctx.rotate(player.vx * 0.008);
-  ctx.drawImage(img, -rw / 2, -rh / 2, rw, rh);
+  ctx.drawImage(img, -rw / 2, -CONFIG.feetY * rh, rw, rh); // anchor visual feet to ground
   ctx.restore();
 }
 
@@ -569,7 +634,8 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     resizeCanvas();
-    if (gameActive) { collectPlatforms(); placePlayer(); }
+    // collectPlatforms 重新计算花朵在新卡片宽度下的 relX，不重置玩家位置
+    if (gameActive) collectPlatforms();
   }, 150);
 });
 

@@ -15,16 +15,23 @@
 
   <!-- 左侧固定导航 -->
   <nav class="side-nav" aria-label="Primary">
-    <span class="side-nav-logo">Aokey</span>
+    <span class="side-nav-logo"><img src="favicon-32x32.png" alt="" /><span>Aokey</span></span>
     <ul>
       <li><a href="index.html" aria-current="page">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
       <li><a href="about/index.html">About</a></li>
     </ul>
-    <!-- PLAY 按钮移到导航底部 -->
-    <button id="game-toggle">▶ PLAY</button>
+    <!-- 底部按钮组：投币 + PLAY -->
+    <div class="nav-bottom-group">
+      <button id="spawn-coin">
+        <img src="images/insert_coins.gif" alt="Spawn coin" />
+      </button>
+      <button id="game-toggle">▶ PLAY</button>
+    </div>
   </nav>
 
-  <header><h1 class="title">Aokey(Tianao's works)</h1></header>
+
+<header><h1 class="title">Aokey(Tianao's works)</h1></header>
 
   <main id="main-content">
     <div class="underline" aria-hidden="true" id="underline-el"></div>
@@ -51,7 +58,7 @@
   <!-- 游戏图层 -->
   <canvas id="game-canvas"></canvas>
   <div id="coin-hud"></div>
-  <button id="spawn-coin">🌷</button>
+
   <div id="controls-hint">← → MOVE &nbsp;·&nbsp; ↑ JUMP &nbsp;·&nbsp; SPACE(air) FLY &nbsp;·&nbsp; ↓ DROP</div>
 
   <!-- 第一步：加载作品数据 -->
@@ -74,6 +81,7 @@
 
   <!-- 第三步：游戏脚本 -->
   <script src="script.js"></script>
+  <script src="shopEffects.js"></script>
 
   <!-- 第四步：弹出层事件 -->
   <script>

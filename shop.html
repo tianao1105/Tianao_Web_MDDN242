@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop – Aokey</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Shop page: no scroll, scene fills viewport */
+    body.shop-page {
+      overflow: hidden;
+      padding-bottom: 0;
+    }
+
+    #spawn-coin { display: none !important; }
+
+    #shop-scene {
+      position: fixed;
+      top: 0;
+      left: var(--nav-w);
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    /* The road: a long platform spanning full width */
+    #shop-road {
+      position: absolute;
+      bottom: 80px;            /* height from viewport bottom */
+      left: 0;
+      right: 0;
+      height: 6px;
+      border-top: 4px solid rgba(21, 38, 122, 0.5);
+      background: rgba(21, 38, 122, 0.08);
+    }
+
+    /* Market building: sits on the road, pinned to the right */
+    #shop-market {
+      position: absolute;
+      bottom: 80px;
+      right: 40px;
+      image-rendering: pixelated;
+      height: min(60vh, 420px);
+      width: auto;
+      display: block;
+      z-index: 1;
+    }
+
+    /* Showcase + items: in front of (to the left of) market */
+    #shop-display-area {
+      position: absolute;
+      bottom: 80px;
+      right: 580px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Row of three standalone showcases */
+    #shop-showcases-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+    }
+
+    /* Each showcase unit: one item sitting on one showcase */
+    .showcase-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    @keyframes itemSpin {
+      0%   { transform: scaleX(1); }
+      25%  { transform: scaleX(0); }
+      50%  { transform: scaleX(-1); }
+      75%  { transform: scaleX(0); }
+      100% { transform: scaleX(1); }
+    }
+
+    .shop-item-img {
+      height: min(9vh, 64px);
+      width: auto;
+      image-rendering: pixelated;
+      display: block;
+      margin-bottom: -28px;
+      animation: itemSpin 2.4s linear infinite;
+    }
+
+    .showcase-unit:nth-child(2) .shop-item-img { animation-delay: -0.8s; }
+    .showcase-unit:nth-child(3) .shop-item-img { animation-delay: -1.6s; }
+
+    .shop-showcase-img {
+      height: min(16vh, 120px);
+      width: auto;
+      image-rendering: pixelated;
+      display: block;
+    }
+
+    /* Item popup tooltip */
+    #item-popup {
+      position: fixed;
+      z-index: 20000;
+      background: rgba(13, 27, 62, 0.95);
+      border: 2px solid #c8b87a;
+      border-radius: 6px;
+      padding: 10px 18px;
+      font-family: 'Pixelify Sans', sans-serif;
+      text-align: center;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(-100%);
+      opacity: 0;
+      transition: opacity 0.18s;
+      white-space: nowrap;
+      margin-top: -14px;
+    }
+    #item-popup.show { opacity: 1; }
+
+    /* Market speech bubble */
+    #market-dialog {
+      position: fixed;
+      z-index: 20000;
+      pointer-events: none;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    #market-dialog.show { opacity: 1; }
+    #market-dialog .bubble {
+      background: rgba(13, 27, 62, 0.95);
+      border: 2px solid #7ab8c8;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-family: 'Pixelify Sans', sans-serif;
+      font-size: 13px;
+      color: #d0eaff;
+      white-space: nowrap;
+      letter-spacing: 0.06em;
+      line-height: 1.5;
+    }
+    #market-dialog .bubble::after {
+      content: '';
+      display: block;
+      width: 0; height: 0;
+      margin: 4px auto 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #7ab8c8;
+    }
+
+    #shop-reset {
+      background: none;
+      color: var(--title-color);
+      border: 1.5px solid rgba(21, 38, 122, 0.35);
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    #shop-reset:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(21, 38, 122, 0.3);
+    }
+    #item-popup .popup-name  { font-size: 15px; font-weight: 700; color: #ffd966; letter-spacing: 0.1em; margin-bottom: 4px; }
+    #item-popup .popup-desc  { font-size: 11px; color: #a0b0d0; margin-bottom: 6px; letter-spacing: 0.05em; }
+    #item-popup .popup-price { font-size: 13px; color: #c8b87a; letter-spacing: 0.08em; }
+  </style>
+</head>
+<body class="shop-page">
+
+  <nav class="side-nav" aria-label="Primary">
+    <span class="side-nav-logo"><img src="favicon-32x32.png" alt="" /><span>Aokey</span></span>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" aria-current="page">Shop</a></li>
+      <li><a href="about/index.html">About</a></li>
+    </ul>
+    <div class="nav-bottom-group">
+      <button id="spawn-coin">
+        <img src="images/insert_coins.gif" alt="Spawn coin" />
+      </button>
+      <button id="shop-reset">↺ RESET</button>
+      <button id="game-toggle">▶ PLAY</button>
+    </div>
+  </nav>
+
+  <div id="shop-scene">
+    <!-- Road platform (player walks on this) -->
+    <div id="shop-road" class="shop-platform"></div>
+
+    <!-- Three showcases each with one item -->
+    <div id="shop-display-area">
+      <div id="shop-showcases-row">
+        <div class="showcase-unit">
+          <img src="images/item_1.png" class="shop-item-img" alt="Item 1" />
+          <img src="images/Showcase.png" class="shop-showcase-img" alt="Showcase" />
+        </div>
+        <div class="showcase-unit">
+          <img src="images/item_2.png" class="shop-item-img" alt="Item 2" />
+          <img src="images/Showcase.png" class="shop-showcase-img" alt="Showcase" />
+        </div>
+        <div class="showcase-unit">
+          <img src="images/item_3.png" class="shop-item-img" alt="Item 3" />
+          <img src="images/Showcase.png" class="shop-showcase-img" alt="Showcase" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Market building at the right end -->
+    <img id="shop-market" src="images/shop_market.gif" alt="Shop Market" />
+  </div>
+
+  <!-- Decorative effect layers -->
+  <div id="effect-rain"   class="shop-effect"></div>
+  <div id="effect-grass"  class="shop-effect"></div>
+  <div id="effect-coffee" class="shop-effect"><div id="coffee-grid"></div></div>
+
+  <!-- Market speech bubble -->
+  <div id="market-dialog"><div class="bubble">Some weird stuff for sale here.<br>Take whatever you like.</div></div>
+
+  <!-- Item info popup -->
+  <div id="item-popup"></div>
+
+  <!-- Game layer -->
+  <canvas id="game-canvas"></canvas>
+  <div id="coin-hud"></div>
+  <div id="controls-hint">← → MOVE &nbsp;·&nbsp; ↑ JUMP &nbsp;·&nbsp; SPACE(air) FLY &nbsp;·&nbsp; ↓ DROP</div>
+
+  <script src="script.js"></script>
+  <script src="shopEffects.js"></script>
+  <script>
+    CONFIG.playerScale = 7.5;
+
+    // ── Item definitions ─────────────────────────
+    const SHOWCASE_ITEMS = [
+      {
+        el:    document.querySelector('.showcase-unit:nth-child(1)'),
+        name:  'Mysterious Water',
+        desc:  'No idea what this is. Might do something weird to the page.',
+        price: 8,
+      },
+      {
+        el:    document.querySelector('.showcase-unit:nth-child(2)'),
+        name:  'Invisible Grass',
+        desc:  'So unremarkable you almost forgot it existed. Still does something.',
+        price: 12,
+      },
+      {
+        el:    document.querySelector('.showcase-unit:nth-child(3)'),
+        name:  'Cat Cat Coffee',
+        desc:  'Brewed by cats, for cats. Side effects may include seeing cats everywhere.',
+        price: 15,
+      },
+    ];
+
+    const popup        = document.getElementById('item-popup');
+    const marketDialog = document.getElementById('market-dialog');
+    const marketEl     = document.getElementById('shop-market');
+
+    // ── Purchase key ─────────────────────────────
+    let buyPending = false;
+    document.addEventListener('keydown', e => {
+      if (e.key === 'e' || e.key === 'E') buyPending = true;
+    });
+    document.addEventListener('keyup', e => {
+      if (e.key === 'e' || e.key === 'E') buyPending = false;
+    });
+
+    // ── Flash message helper (temporary status messages) ─────────────────
+    let flashActive = false;
+    let flashTimer  = null;
+    function flashPopup(html, durationMs, anchorRect) {
+      flashActive = true;
+      clearTimeout(flashTimer);
+      popup.innerHTML = html;
+      if (anchorRect) {
+        popup.style.left = (anchorRect.left + anchorRect.width / 2) + 'px';
+        popup.style.top  = anchorRect.top + 'px';
+      }
+      popup.classList.add('show');
+      flashTimer = setTimeout(() => {
+        flashActive = false;
+        popup.classList.remove('show');
+      }, durationMs);
+    }
+
+    // ── Proximity + purchase loop ─────────────────
+    function shopProximityLoop() {
+      if (!gameActive) {
+        if (!flashActive) popup.classList.remove('show');
+        requestAnimationFrame(shopProximityLoop);
+        return;
+      }
+
+      const px = player.docX - window.scrollX + player.w / 2;
+      const py = player.docY - window.scrollY + player.h;
+
+      let found = null;
+      for (let i = 0; i < SHOWCASE_ITEMS.length; i++) {
+        const item = SHOWCASE_ITEMS[i];
+        const r = item.el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        if (Math.abs(px - cx) < 120 && py > r.top - 200 && py < r.bottom + 60) {
+          found = { item, r, idx: i };
+          break;
+        }
+      }
+
+      if (found) {
+        const { item, r, idx } = found;
+
+        // Handle E-key purchase
+        if (buyPending) {
+          buyPending = false;
+          if (SHOP_EFFECTS.has(idx)) {
+            flashPopup(
+              `<div class="popup-name">${item.name}</div>` +
+              `<div class="popup-desc" style="color:#ffd966">已拥有！</div>`,
+              1400, r
+            );
+          } else if (collectedCount >= item.price) {
+            collectedCount -= item.price;
+            updateCoinHUD();
+            SHOP_EFFECTS.buy(idx);
+            flashPopup(
+              `<div class="popup-name">${item.name}</div>` +
+              `<div class="popup-desc" style="color:#6dffb3">购买成功！✨</div>`,
+              1800, r
+            );
+          } else {
+            flashPopup(
+              `<div class="popup-name">${item.name}</div>` +
+              `<div class="popup-desc" style="color:#ff6b6b">金币不足！</div>` +
+              `<div class="popup-price">🪙 需要 ×${item.price} 金币</div>`,
+              1800, r
+            );
+          }
+        } else if (!flashActive) {
+          // Normal proximity info
+          const owned = SHOP_EFFECTS.has(idx);
+          popup.innerHTML =
+            `<div class="popup-name">${item.name}</div>` +
+            `<div class="popup-desc">${item.desc}</div>` +
+            `<div class="popup-price">${owned
+              ? '✅ 已拥有'
+              : `🪙 ×${item.price} 金币 &nbsp;·&nbsp; <b style="color:#a0ffc0">[E] 购买</b>`
+            }</div>`;
+          popup.style.left = (r.left + r.width / 2) + 'px';
+          popup.style.top  = r.top + 'px';
+          popup.classList.add('show');
+        }
+      } else {
+        if (!flashActive) popup.classList.remove('show');
+      }
+
+      // Market proximity → speech bubble
+      const mr  = marketEl.getBoundingClientRect();
+      const mcx = mr.left + mr.width / 2;
+      const nearMarket = Math.abs(px - mcx) < 160 && py > mr.top - 60 && py < mr.bottom + 40;
+      if (nearMarket && !found) {
+        marketDialog.style.left = mcx + 'px';
+        marketDialog.style.top  = (mr.top - 10) + 'px';
+        marketDialog.classList.add('show');
+      } else {
+        marketDialog.classList.remove('show');
+      }
+
+      requestAnimationFrame(shopProximityLoop);
+    }
+
+    shopProximityLoop();
+
+    // ── Reset button ─────────────────────────────
+    document.getElementById('shop-reset').addEventListener('click', () => {
+      localStorage.removeItem('shopPurchases');
+      location.reload();
+    });
+  </script>
+
+</body>
+</html>
