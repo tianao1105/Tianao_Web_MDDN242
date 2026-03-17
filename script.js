@@ -301,7 +301,7 @@ function update() {
       c.collected = true;
       collectedCount++;
       updateCoinHUD();
-      spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#ff4444');
+      spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#FFD700');
     }
   }
 
@@ -339,7 +339,7 @@ function update() {
       c.collected = true;
       collectedCount++;
       updateCoinHUD();
-      spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#ff4444');
+      spawnParticles(c.docX - window.scrollX, c.docY - window.scrollY, 10, '#FFD700');
     }
     // Remove if below viewport
     if (c.docY > window.scrollY + window.innerHeight + 100) c.collected = true;
