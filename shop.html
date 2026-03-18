@@ -326,7 +326,7 @@
           if (SHOP_EFFECTS.has(idx)) {
             flashPopup(
               `<div class="popup-name">${item.name}</div>` +
-              `<div class="popup-desc" style="color:#ffd966">已拥有！</div>`,
+              `<div class="popup-desc" style="color:#ffd966">Get！</div>`,
               1400, r
             );
           } else if (collectedCount >= item.price) {
@@ -335,14 +335,14 @@
             SHOP_EFFECTS.buy(idx);
             flashPopup(
               `<div class="popup-name">${item.name}</div>` +
-              `<div class="popup-desc" style="color:#6dffb3">购买成功！✨</div>`,
+              `<div class="popup-desc" style="color:#6dffb3">You get it！✨</div>`,
               1800, r
             );
           } else {
             flashPopup(
               `<div class="popup-name">${item.name}</div>` +
-              `<div class="popup-desc" style="color:#ff6b6b">金币不足！</div>` +
-              `<div class="popup-price">🪙 需要 ×${item.price} 金币</div>`,
+              `<div class="popup-desc" style="color:#ff6b6b">Coin not enough！</div>` +
+              `<div class="popup-price">🪙 need ×${item.price} Coin</div>`,
               1800, r
             );
           }
@@ -353,8 +353,8 @@
             `<div class="popup-name">${item.name}</div>` +
             `<div class="popup-desc">${item.desc}</div>` +
             `<div class="popup-price">${owned
-              ? '✅ 已拥有'
-              : `🪙 ×${item.price} 金币 &nbsp;·&nbsp; <b style="color:#a0ffc0">[E] 购买</b>`
+              ? '✅ Get！'
+              : `🪙 ×${item.price} Coin &nbsp;·&nbsp; <b style="color:#a0ffc0">[E] Buy</b>`
             }</div>`;
           popup.style.left = (r.left + r.width / 2) + 'px';
           popup.style.top  = r.top + 'px';
