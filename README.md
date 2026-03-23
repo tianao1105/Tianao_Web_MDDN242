@@ -76,6 +76,7 @@ Click **▶ PLAY** in the sidebar to start.
 | `Space` (in air) | Fly |
 | `↓` or `S` | Drop through platform |
 | Mouse drag | Drag character directly |
+| `E`|Enter Game / Buy |
 
 Hold the coin button to drop coins from above — collect them by walking into them. Coin count is saved across pages.
 
