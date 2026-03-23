@@ -173,6 +173,22 @@
     #item-popup .popup-name  { font-size: 15px; font-weight: 700; color: #ffd966; letter-spacing: 0.1em; margin-bottom: 4px; }
     #item-popup .popup-desc  { font-size: 11px; color: #a0b0d0; margin-bottom: 6px; letter-spacing: 0.05em; }
     #item-popup .popup-price { font-size: 13px; color: #c8b87a; letter-spacing: 0.08em; }
+    #popup-buy-btn {
+      display: none;
+      margin-top: 8px;
+      background: var(--game-toggle-bg);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+    }
+    @media (pointer: coarse) {
+      #popup-buy-btn { display: block; }
+    }
 
     @media (max-width: 600px) {
       #controls-hint {
@@ -240,7 +256,7 @@
   <div id="market-dialog"><div class="bubble">Some weird stuff for sale here.<br>Take whatever you like.</div></div>
 
   <!-- Item info popup -->
-  <div id="item-popup"></div>
+  <div id="item-popup"><div id="popup-content"></div><button id="popup-buy-btn">BUY</button></div>
 
   <!-- Game layer -->
   <canvas id="game-canvas"></canvas>
@@ -277,16 +293,21 @@
     ];
 
     const popup        = document.getElementById('item-popup');
+    const popupContent = document.getElementById('popup-content');
+    const popupBuyBtn  = document.getElementById('popup-buy-btn');
     const marketDialog = document.getElementById('market-dialog');
     const marketEl     = document.getElementById('shop-market');
 
-    // ── Purchase key ─────────────────────────────
+    // ── Purchase key / tap ────────────────────────
     let buyPending = false;
     document.addEventListener('keydown', e => {
       if (e.key === 'e' || e.key === 'E') buyPending = true;
     });
     document.addEventListener('keyup', e => {
       if (e.key === 'e' || e.key === 'E') buyPending = false;
+    });
+    document.getElementById('popup-buy-btn').addEventListener('click', () => {
+      buyPending = true;
     });
 
     // ── Flash message helper (temporary status messages) ─────────────────
@@ -295,7 +316,8 @@
     function flashPopup(html, durationMs, anchorRect) {
       flashActive = true;
       clearTimeout(flashTimer);
-      popup.innerHTML = html;
+      popupContent.innerHTML = html;
+      popupBuyBtn.style.display = 'none';
       if (anchorRect) {
         popup.style.left = (anchorRect.left + anchorRect.width / 2) + 'px';
         popup.style.top  = anchorRect.top + 'px';
@@ -361,13 +383,14 @@
         } else if (!flashActive) {
           // Normal proximity info
           const owned = SHOP_EFFECTS.has(idx);
-          popup.innerHTML =
+          popupContent.innerHTML =
             `<div class="popup-name">${item.name}</div>` +
             `<div class="popup-desc">${item.desc}</div>` +
             `<div class="popup-price">${owned
               ? '✅ Get！'
               : `🪙 ×${item.price} Coin &nbsp;·&nbsp; <b style="color:#a0ffc0">[E] Buy</b>`
             }</div>`;
+          popupBuyBtn.style.display = owned ? 'none' : '';
           popup.style.left = (r.left + r.width / 2) + 'px';
           popup.style.top  = r.top + 'px';
           popup.classList.add('show');

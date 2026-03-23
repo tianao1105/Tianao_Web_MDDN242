@@ -414,9 +414,10 @@ body.game-active #game-toggle {
 
   body { padding: 20px 14px 40px calc(var(--nav-w) + 12px); }
 
-  .side-nav-logo { font-size: 20px; }
+  .side-nav-logo { font-size: 20px; margin-bottom: 16px; }
   .side-nav a    { font-size: 14px; gap: 6px; }
-  .side-nav ul   { gap: 28px; }
+  .side-nav ul   { gap: 18px; }
+  .side-nav      { overflow-y: auto; padding: 20px 14px; }
 }
 
 /* ════════════════════════════════════════
