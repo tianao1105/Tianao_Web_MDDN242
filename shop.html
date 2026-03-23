@@ -185,12 +185,23 @@
       font-size: 12px;
       letter-spacing: 0.08em;
       cursor: pointer;
+      pointer-events: auto;   /* override parent pointer-events:none */
     }
     @media (pointer: coarse) {
       #popup-buy-btn { display: block; }
     }
 
     @media (max-width: 600px) {
+      #item-popup {
+        font-size: 11px;
+        padding: 7px 12px;
+        white-space: normal;
+        max-width: 160px;
+        text-align: center;
+      }
+      #item-popup .popup-name  { font-size: 12px; }
+      #item-popup .popup-desc  { font-size: 10px; }
+      #item-popup .popup-price { font-size: 11px; }
       #controls-hint {
         font-size: 10px;
         padding: 5px 10px;
