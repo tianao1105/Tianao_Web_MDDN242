@@ -69,14 +69,18 @@ All the other pictures are my own creations.
 
 Click **▶ PLAY** in the sidebar to start.
 
-| Key | Action |
-|-----|--------|
+| Key / Input | Action |
+|-------------|--------|
 | `← →` or `A D` | Move left / right |
 | `↑` or `W` | Jump |
 | `Space` (in air) | Fly |
 | `↓` or `S` | Drop through platform |
 | Mouse drag | Drag character directly |
-| `E`|Enter Game / Buy |
+| `E` | Enter Game / Buy |
+| Swipe left / right | Move (mobile) |
+| Tap | Jump / Fly (mobile) |
+
+
 
 Hold the coin button to drop coins from above — collect them by walking into them. Coin count is saved across pages.
 
