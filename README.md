@@ -2,9 +2,9 @@
 A personal portfolio website featuring mini-games.
 ## Influences & Inspiration
 
-- Classic 2D platformer games : general inspiration for the in-page game mechanic
-- RPG merchant/shop systems : model for the item purchase and coin economy
-- Minimalist portfolio design aesthetic : keeping the layout clean and content-focused
+- Classic 2D platformer games - general inspiration for the in-page game mechanic
+- RPG merchant/shop systems - model for the item purchase and coin economy
+- Minimalist portfolio design aesthetic - keeping the layout clean and content-focused
 
 ## Design Journal
 
