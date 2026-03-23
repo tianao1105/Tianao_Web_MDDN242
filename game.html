@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Games – Aokey</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+      gap: var(--card-gap);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    @media (min-width: 1200px) {
+      .game-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      }
+    }
+    .game-card {
+      aspect-ratio: 1;
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: var(--card-radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+    .game-card:not(.locked):hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 28px rgba(21, 38, 122, 0.25);
+    }
+    .game-card.locked { opacity: 0.4; cursor: default; }
+    .game-icon  { font-size: 52px; line-height: 1; }
+    .game-title { font-size: 16px; color: var(--title-color); font-weight: 700; letter-spacing: 0.06em; }
+    .game-badge {
+      position: absolute; top: 12px; right: 12px;
+      font-size: 10px; padding: 3px 8px;
+      background: var(--game-toggle-bg); color: #fff;
+      border-radius: 20px; letter-spacing: 0.08em;
+    }
+
+    /* ── Fullscreen overlay ── */
+    #game-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      background: #080c1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    #game-overlay.open { opacity: 1; pointer-events: auto; }
+    #overlay-title {
+      font-family: 'Pixelify Sans', sans-serif;
+      font-size: 18px; color: #c8d8ff; letter-spacing: 0.14em;
+    }
+    #game-canvas-main {
+      border: 2px solid rgba(21,38,122,0.7); border-radius: 6px;
+      image-rendering: pixelated;
+      max-width: calc(100vw - 40px);
+      max-height: calc(100vh - 140px);
+    }
+    #overlay-bottom {
+      display: flex; align-items: center; gap: 24px;
+      font-family: 'Pixelify Sans', sans-serif;
+    }
+    #game-score-display { font-size: 15px; color: #ffd966; letter-spacing: 0.1em; min-width: 70px; }
+    #game-close {
+      background: none; border: 1.5px solid rgba(200,216,255,0.3);
+      border-radius: 6px; color: #c8d8ff;
+      font-family: 'Pixelify Sans', sans-serif;
+      font-size: 13px; padding: 7px 18px; cursor: pointer; transition: background 0.15s;
+    }
+    #game-close:hover { background: rgba(200,216,255,0.1); }
+
+    @media (max-width: 600px) {
+      .game-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="side-nav" aria-label="Primary">
+    <span class="side-nav-logo"><img src="favicon-32x32.png" alt="" /><span>Aokey</span></span>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="photography.html">Photography</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="game.html" aria-current="page">Games</a></li>
+      <li><a href="about/index.html">About</a></li>
+    </ul>
+    <div class="nav-bottom-group">
+      <button id="spawn-coin"><img src="images/insert_coins.gif" alt="Spawn coin" /></button>
+      <button id="game-toggle">▶ PLAY</button>
+    </div>
+  </nav>
+
+  <header><h1 class="title">Games</h1></header>
+
+  <main id="main-content">
+    <div class="underline" aria-hidden="true"></div>
+    <section class="works" aria-label="Game arcade">
+      <h2 class="section-title">ARCADE</h2>
+      <div class="game-grid">
+        <div class="game-card" data-game="flappy">
+          <span class="game-badge">PLAY</span>
+          <div class="game-icon"><img id="aofly-icon" src="images/fly-1.png" style="height:80px;image-rendering:pixelated;" alt="AoFly" /></div>
+          <div class="game-title">AoFly</div>
+        </div>
+        <div class="game-card" data-game="snake">
+          <span class="game-badge">PLAY</span>
+          <div class="game-icon"><img id="snake-icon" src="images/人物.png" style="height:80px;image-rendering:pixelated;" alt="Snake" /></div>
+          <div class="game-title">COIN SNAKE</div>
+        </div>
+        <div class="game-card" data-game="slots">
+          <span class="game-badge">PLAY</span>
+          <div class="game-icon">
+            <canvas id="slots-icon-canvas" width="80" height="80" style="height:80px;image-rendering:pixelated;display:block;"></canvas>
+            <img id="slots-icon-gif" src="images/insert_coins.gif" style="height:80px;image-rendering:pixelated;display:none;" alt="Slots" />
+          </div>
+          <div class="game-title">SLOTS</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><small>&copy; <span id="year"></span> Tianao Wang</small></footer>
+
+  <div id="game-overlay">
+    <div id="overlay-title">AoFly</div>
+    <canvas id="game-canvas-main"></canvas>
+    <div id="overlay-bottom">
+      <div id="game-score-display"><img src="images/coin_gif.gif" style="height:22px;image-rendering:pixelated;vertical-align:middle;" /> <span id="game-score-num">0</span></div>
+      <button id="slot-spin-btn" style="display:none;background:none;border:none;cursor:pointer;padding:0;">
+        <img src="images/insert_coins.gif" style="height:52px;image-rendering:pixelated;" />
+      </button>
+      <button id="game-close">✕ EXIT</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="shopEffects.js"></script>
+  <script src="colorWheel.js"></script>
+  <script src="coinHud.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ── Snake icon: horizontal flip on hover ──────
+    const snakeIcon = document.getElementById('snake-icon');
+    let flipTimer = null;
+    let flipped = false;
+    document.querySelector('[data-game="snake"]').addEventListener('mouseenter', () => {
+      flipTimer = setInterval(() => {
+        flipped = !flipped;
+        snakeIcon.style.transform = flipped ? 'scaleX(-1)' : 'scaleX(1)';
+      }, 300);
+    });
+    document.querySelector('[data-game="snake"]').addEventListener('mouseleave', () => {
+      clearInterval(flipTimer);
+      flipped = false;
+      snakeIcon.style.transform = 'scaleX(1)';
+    });
+
+    // ── Slots icon: static canvas → animated GIF on hover ──
+    const slotsCanvas = document.getElementById('slots-icon-canvas');
+    const slotsGif    = document.getElementById('slots-icon-gif');
+    const slotsCtx    = slotsCanvas.getContext('2d');
+    const slotsCard   = document.querySelector('[data-game="slots"]');
+
+    function drawSlotsFirstFrame() {
+      slotsCtx.imageSmoothingEnabled = false;
+      slotsCtx.drawImage(slotsGif, 0, 0, 80, 80);
+    }
+    if (slotsGif.complete) drawSlotsFirstFrame();
+    else slotsGif.addEventListener('load', drawSlotsFirstFrame);
+
+    slotsCard.addEventListener('mouseenter', () => {
+      slotsCanvas.style.display = 'none';
+      slotsGif.src = 'images/insert_coins.gif?' + Date.now(); // restart gif
+      slotsGif.style.display = 'block';
+    });
+    slotsCard.addEventListener('mouseleave', () => {
+      slotsGif.style.display = 'none';
+      slotsCanvas.style.display = 'block';
+    });
+
+    // ── Flap animation on card hover ──────────────
+    const aoflyIcon = document.getElementById('aofly-icon');
+    let flapTimer = null;
+    let flapFrame = 0;
+    const flapSrcs = ['images/fly-1.png', 'images/fly-2.png'];
+
+    aoflyIcon.closest('.game-card').addEventListener('mouseenter', () => {
+      flapTimer = setInterval(() => {
+        flapFrame ^= 1;
+        aoflyIcon.src = flapSrcs[flapFrame];
+      }, 120);
+    });
+    aoflyIcon.closest('.game-card').addEventListener('mouseleave', () => {
+      clearInterval(flapTimer);
+      flapFrame = 0;
+      aoflyIcon.src = flapSrcs[0];
+    });
+
+    const overlay      = document.getElementById('game-overlay');
+    const closeBtn     = document.getElementById('game-close');
+    const gameCanvas   = document.getElementById('game-canvas-main');
+    const scoreDisplay = document.getElementById('game-score-display');
+    let activeGame = null;
+
+    document.querySelectorAll('.game-card:not(.locked)').forEach(card => {
+      card.addEventListener('click', () => {
+        overlay.classList.add('open');
+        launchGame(card.dataset.game);
+      });
+    });
+    closeBtn.addEventListener('click', closeOverlay);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+    function closeOverlay() {
+      overlay.classList.remove('open');
+      if (activeGame) { activeGame.stop(); activeGame = null; }
+    }
+    function launchGame(id) {
+      if (activeGame) { activeGame.stop(); activeGame = null; }
+      const titles = { flappy: 'AoFly', snake: 'COIN SNAKE', slots: 'SLOTS' };
+      document.getElementById('overlay-title').textContent = titles[id] || id;
+      if (id === 'flappy') activeGame = new FlappyGame(gameCanvas, scoreDisplay);
+      if (id === 'snake')  activeGame = new SnakeGame(gameCanvas, scoreDisplay);
+      if (id === 'slots')  activeGame = new SlotGame(gameCanvas, scoreDisplay);
+    }
+
+    // ── Flappy Bird ───────────────────────────────
+    class FlappyGame {
+      constructor(canvas, scoreEl) {
+        this.canvas  = canvas;
+        this.scoreEl = scoreEl;
+        this.ctx     = canvas.getContext('2d');
+        this.W       = 360;
+        this.H       = 560;
+        canvas.width  = this.W;
+        canvas.height = this.H;
+
+        // Bird sprites
+        this.sprites = [new Image(), new Image()];
+        this.sprites[0].src = 'images/fly-1.png';
+        this.sprites[1].src = 'images/fly-2.png';
+        this.spriteFrame = 0;
+        this.spriteTimer = 0;
+
+        // Coin sprite
+        this.coinImg = new Image();
+        this.coinImg.src = 'images/coin_gif.gif';
+
+        this.running  = false;
+        this.raf      = null;
+        this._onFlap  = this._onFlap.bind(this);
+        document.addEventListener('keydown', this._onFlap);
+        canvas.addEventListener('touchstart', this._onFlap, { passive: false });
+        canvas.addEventListener('mousedown',  this._onFlap);
+
+        // Wait for both sprites to load then start
+        let loaded = 0;
+        const onLoad = () => { if (++loaded === 2) { this.reset(); this.start(); } };
+        this.sprites.forEach(s => {
+          if (s.complete) onLoad();
+          else s.onload = onLoad;
+        });
+      }
+
+      reset() {
+        const { W, H } = this;
+        this.bird  = { x: W * 0.22, y: H * 0.45, vy: 0, r: 18 };
+        this.pipes = [];
+        this.score = 0;
+        this.state = 'idle';   // idle | playing | dead
+        this.frameCount  = 0;
+        this.pipeTimer   = 0;
+        this.pipeGap     = 160;
+        this.pipeW       = 42;
+        this.pipeSpeed   = 0.8;
+        this.gravity     = 0.13;
+        this.flapStr     = -3.2;
+        this._updateScore();
+      }
+
+      start() {
+        this.running = true;
+        const loop = () => {
+          if (!this.running) return;
+          this.raf = requestAnimationFrame(loop);
+          this._tick();
+          this._draw();
+        };
+        this.raf = requestAnimationFrame(loop);
+      }
+
+      stop() {
+        this.running = false;
+        cancelAnimationFrame(this.raf);
+        document.removeEventListener('keydown', this._onFlap);
+        this.canvas.removeEventListener('touchstart', this._onFlap);
+        this.canvas.removeEventListener('mousedown',  this._onFlap);
+      }
+
+      _tick() {
+        if (this.state === 'dead') return;
+        this.frameCount++;
+
+        // Sprite animation
+        this.spriteTimer++;
+        if (this.spriteTimer >= 8) { this.spriteTimer = 0; this.spriteFrame ^= 1; }
+
+        if (this.state === 'idle') {
+          // Gentle bob
+          this.bird.y = this.H * 0.45 + Math.sin(this.frameCount * 0.07) * 8;
+          return;
+        }
+
+        // Physics
+        this.bird.vy += this.gravity;
+        this.bird.y  += this.bird.vy;
+
+        // Spawn pipes
+        this.pipeTimer++;
+        const spawnInterval = Math.max(110, 180 - this.score * 3);
+        if (this.pipeTimer >= spawnInterval) {
+          this.pipeTimer = 0;
+          const minTop = 60, maxTop = this.H - this.pipeGap - 60;
+          const topH = minTop + Math.random() * (maxTop - minTop);
+          this.pipes.push({ x: this.W, topH, passed: false });
+        }
+
+        // Move & check pipes
+        for (let i = this.pipes.length - 1; i >= 0; i--) {
+          const p = this.pipes[i];
+          p.x -= this.pipeSpeed + this.score * 0.015;
+          if (p.x + this.pipeW < 0) { this.pipes.splice(i, 1); continue; }
+
+          // Pipe passed
+          if (!p.passed && p.x + this.pipeW < this.bird.x - this.bird.r) {
+            p.passed = true;
+            this.score++;
+            this._updateScore();
+          }
+
+
+          // Collision (circle vs rect)
+          if (this._hitsP(p)) { this._onDead(); return; }
+        }
+
+        // Floor / ceiling
+        if (this.bird.y + this.bird.r > this.H || this.bird.y - this.bird.r < 0) {
+          this._onDead();
+        }
+      }
+
+      _hitsP(p) {
+        const { x, y, r } = this.bird;
+        const hit = (rx, ry, rw, rh) => {
+          const cx = Math.max(rx, Math.min(x, rx + rw));
+          const cy = Math.max(ry, Math.min(y, ry + rh));
+          return (x - cx) ** 2 + (y - cy) ** 2 < (r - 3) ** 2;
+        };
+        return hit(p.x, 0, this.pipeW, p.topH) ||
+               hit(p.x, p.topH + this.pipeGap, this.pipeW, this.H - p.topH - this.pipeGap);
+      }
+
+      _draw() {
+        const { ctx, W, H } = this;
+
+        // Background — complementary hue of colour wheel
+        const h = this._wheelHue();
+        const ch = (h + 180) % 360;
+        ctx.fillStyle = `hsl(${ch},40%,8%)`;
+        ctx.fillRect(0, 0, W, H);
+
+        // Grid
+        ctx.strokeStyle = `hsla(${ch},50%,50%,0.18)`;
+        ctx.lineWidth = 1;
+        const cell = 28;
+        for (let x = 0; x < W; x += cell) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+        }
+        for (let y = 0; y < H; y += cell) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        }
+
+        // Pipes — colour tracks the colour wheel hue
+        this.pipes.forEach(p => {
+          ctx.fillStyle = `hsl(${h},55%,18%)`;
+          ctx.fillRect(p.x, 0, this.pipeW, p.topH);
+          ctx.fillRect(p.x, p.topH + this.pipeGap, this.pipeW, H - p.topH - this.pipeGap);
+          // Pipe caps
+          ctx.fillStyle = `hsl(${h},60%,30%)`;
+          ctx.fillRect(p.x - 4, p.topH - 12, this.pipeW + 8, 12);
+          ctx.fillRect(p.x - 4, p.topH + this.pipeGap, this.pipeW + 8, 12);
+          // Pipe edge highlight
+          ctx.fillStyle = `hsla(${h},80%,70%,0.15)`;
+          ctx.fillRect(p.x, 0, 4, p.topH);
+          ctx.fillRect(p.x, p.topH + this.pipeGap, 4, H);
+        });
+
+        // Floor line
+        ctx.fillStyle = '#1a3a6a';
+        ctx.fillRect(0, H - 4, W, 4);
+
+        // Bird sprite
+        const { x, y, r } = this.bird;
+        const sz = r * 2.6;
+        const angle = this.state === 'playing'
+          ? Math.max(-0.5, Math.min(1.2, this.bird.vy * 0.08))
+          : 0;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(this.sprites[this.spriteFrame], -sz / 2, -sz / 2, sz, sz);
+        ctx.restore();
+
+        // Idle prompt
+        if (this.state === 'idle') {
+          ctx.fillStyle = 'rgba(8,12,26,0.55)';
+          ctx.fillRect(W / 2 - 90, H / 2 - 30, 180, 52);
+          ctx.fillStyle = '#c8d8ff';
+          ctx.font = "bold 16px 'Pixelify Sans'";
+          ctx.textAlign    = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('PRESS SPACE / TAP', W / 2, H / 2 - 10);
+          ctx.fillStyle = '#6878a0';
+          ctx.font = "11px 'Pixelify Sans'";
+          ctx.fillText('to start', W / 2, H / 2 + 12);
+        }
+
+        // Dead screen
+        if (this.state === 'dead') {
+          ctx.fillStyle = 'rgba(8,12,26,0.78)';
+          ctx.fillRect(0, 0, W, H);
+          ctx.textAlign    = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#ff6b6b';
+          ctx.font = "bold 30px 'Pixelify Sans'";
+          ctx.fillText('GAME OVER', W / 2, H / 2 - 36);
+          ctx.fillStyle = '#ffd966';
+          ctx.font = "16px 'Pixelify Sans'";
+          ctx.fillText(`You collected ${this.score} coin${this.score !== 1 ? 's' : ''}`, W / 2, H / 2 + 2);
+          ctx.fillStyle = '#6878a0';
+          ctx.font = "12px 'Pixelify Sans'";
+          ctx.fillText('Press Space / Tap to retry', W / 2, H / 2 + 32);
+        }
+
+        // Score in-canvas
+        if (this.state === 'playing') {
+          ctx.fillStyle = 'rgba(200,216,255,0.85)';
+          ctx.font = "bold 22px 'Pixelify Sans'";
+          ctx.textAlign    = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(this.score, W / 2, 14);
+        }
+      }
+
+      _onDead() {
+        this.state = 'dead';
+        const prev = parseInt(localStorage.getItem('coinCount') || '0', 10);
+        localStorage.setItem('coinCount', prev + this.score);
+        if (typeof renderCoinHud === 'function') renderCoinHud();
+      }
+
+      _updateScore() {
+        this.scoreEl.querySelector('#game-score-num').textContent = this.score;
+      }
+
+      _wheelHue() {
+        try {
+          const s = JSON.parse(localStorage.getItem('aokey-bg'));
+          if (s && typeof s.h === 'number') return Math.round(s.h);
+        } catch (_) {}
+        return 220; // fallback blue
+      }
+
+      _onFlap(e) {
+        // Only flap on space / enter / any touch/click, not modifier keys
+        if (e.type === 'keydown' && e.key !== ' ' && e.key !== 'ArrowUp' && e.key !== 'Enter') return;
+        if (e.type === 'keydown') e.preventDefault();
+        if (e.type === 'touchstart') e.preventDefault();
+
+        if (this.state === 'idle') {
+          this.state = 'playing';
+          this.bird.vy = this.flapStr;
+          return;
+        }
+        if (this.state === 'dead') {
+          this.reset();
+          this.state = 'playing';
+          this.bird.vy = this.flapStr;
+          return;
+        }
+        this.bird.vy = this.flapStr;
+      }
+    }
+
+    // ── Coin Snake ────────────────────────────────
+    class SnakeGame {
+      constructor(canvas, scoreEl) {
+        this.canvas  = canvas;
+        this.scoreEl = scoreEl;
+        this.ctx     = canvas.getContext('2d');
+        this.cell    = 28;
+        this.cols    = 18;
+        this.rows    = 18;
+        canvas.width  = this.cols * this.cell;
+        canvas.height = this.rows * this.cell;
+
+        // Sprites
+        this.headImg = new Image();
+        this.headImg.src = 'images/人物.png';
+        this.coinImg = new Image();
+        this.coinImg.src = 'images/coin_gif.gif';
+
+        this.running = false;
+        this.raf     = null;
+        this._onKey   = this._onKey.bind(this);
+        this._onTouch = this._onTouch.bind(this);
+        document.addEventListener('keydown', this._onKey);
+        canvas.addEventListener('touchstart', this._onTouch, { passive: false });
+
+        this.reset();
+        this.start();
+      }
+
+      reset() {
+        const mid = Math.floor(this.cols / 2);
+        this.snake  = [{x:mid,y:9},{x:mid-1,y:9},{x:mid-2,y:9}];
+        this.dir    = {x:1, y:0};
+        this.next   = {x:1, y:0};
+        this.score  = 0;
+        this.speed  = 160;
+        this.food   = this._placeFood();
+        this.dead   = false;
+        this._updateScore();
+      }
+
+      start() {
+        this.running  = true;
+        this.lastTick = performance.now();
+        const loop = now => {
+          if (!this.running) return;
+          this.raf = requestAnimationFrame(loop);
+          if (now - this.lastTick >= this.speed) {
+            this.lastTick = now;
+            this._tick();
+          }
+          this._draw();
+        };
+        this.raf = requestAnimationFrame(loop);
+      }
+
+      stop() {
+        this.running = false;
+        cancelAnimationFrame(this.raf);
+        document.removeEventListener('keydown', this._onKey);
+        this.canvas.removeEventListener('touchstart', this._onTouch);
+      }
+
+      _tick() {
+        if (this.dead) { this.reset(); return; }
+        this.dir = { ...this.next };
+        const head = {
+          x: (this.snake[0].x + this.dir.x + this.cols) % this.cols,
+          y: (this.snake[0].y + this.dir.y + this.rows) % this.rows,
+        };
+        if (this.snake.some(s => s.x === head.x && s.y === head.y)) {
+          this.dead = true; return;
+        }
+        this.snake.unshift(head);
+        if (head.x === this.food.x && head.y === this.food.y) {
+          this.score++;
+          this.speed = Math.max(70, this.speed - 5);
+          this.food  = this._placeFood();
+          this._updateScore();
+        } else {
+          this.snake.pop();
+        }
+      }
+
+      _draw() {
+        const { ctx, cell, cols, rows } = this;
+        const h  = this._wheelHue();
+        const ch = (h + 180) % 360;
+
+        // Background
+        ctx.fillStyle = `hsl(${ch},40%,8%)`;
+        ctx.fillRect(0, 0, cols * cell, rows * cell);
+
+        // Grid
+        ctx.strokeStyle = `hsla(${ch},50%,50%,0.18)`;
+        ctx.lineWidth = 1;
+        for (let x = 0; x < cols; x++) {
+          ctx.beginPath(); ctx.moveTo(x*cell,0); ctx.lineTo(x*cell,rows*cell); ctx.stroke();
+        }
+        for (let y = 0; y < rows; y++) {
+          ctx.beginPath(); ctx.moveTo(0,y*cell); ctx.lineTo(cols*cell,y*cell); ctx.stroke();
+        }
+
+        // Food coin
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(this.coinImg,
+          this.food.x * cell + 2, this.food.y * cell + 2,
+          cell - 4, cell - 4);
+
+        // Body coins (skip head index 0)
+        for (let i = 1; i < this.snake.length; i++) {
+          const s = this.snake[i];
+          ctx.drawImage(this.coinImg,
+            s.x * cell + 3, s.y * cell + 3,
+            cell - 6, cell - 6);
+        }
+
+        // Head — player sprite, flip horizontally when moving left
+        const hd = this.snake[0];
+        ctx.save();
+        ctx.translate(hd.x * cell + cell / 2, hd.y * cell + cell / 2);
+        if (this.dir.x < 0) ctx.scale(-1, 1);
+        ctx.drawImage(this.headImg, -cell / 2, -cell / 2, cell, cell);
+        ctx.restore();
+
+        // Dead screen
+        if (this.dead) {
+          ctx.fillStyle = 'rgba(8,12,26,0.78)';
+          ctx.fillRect(0, 0, cols*cell, rows*cell);
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          const cx = cols*cell/2, cy = rows*cell/2;
+          ctx.fillStyle = '#ff6b6b';
+          ctx.font = "bold 28px 'Pixelify Sans'";
+          ctx.fillText('GAME OVER', cx, cy - 28);
+          ctx.fillStyle = '#ffd966';
+          ctx.font = "16px 'Pixelify Sans'";
+          ctx.fillText(`You collected ${this.score} coin${this.score !== 1 ? 's' : ''}`, cx, cy + 8);
+          ctx.fillStyle = '#6878a0';
+          ctx.font = "12px 'Pixelify Sans'";
+          ctx.fillText('Press any key to restart', cx, cy + 34);
+          // Add coins to total on first dead frame
+          if (!this._scored) {
+            this._scored = true;
+            const prev = parseInt(localStorage.getItem('coinCount') || '0', 10);
+            localStorage.setItem('coinCount', prev + this.score);
+            if (typeof renderCoinHud === 'function') renderCoinHud();
+          }
+        } else {
+          this._scored = false;
+          // Score in canvas
+          ctx.fillStyle = 'rgba(200,216,255,0.85)';
+          ctx.font = "bold 20px 'Pixelify Sans'";
+          ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+          ctx.fillText(this.score, cols*cell/2, 10);
+        }
+      }
+
+      _updateScore() {
+        this.scoreEl.querySelector('#game-score-num').textContent = this.score;
+      }
+
+      _placeFood() {
+        let pos;
+        do {
+          pos = { x: Math.floor(Math.random()*this.cols), y: Math.floor(Math.random()*this.rows) };
+        } while (this.snake.some(s => s.x === pos.x && s.y === pos.y));
+        return pos;
+      }
+
+      _wheelHue() {
+        try {
+          const s = JSON.parse(localStorage.getItem('aokey-bg'));
+          if (s && typeof s.h === 'number') return Math.round(s.h);
+        } catch (_) {}
+        return 220;
+      }
+
+      _onKey(e) {
+        const map = {
+          ArrowUp:{x:0,y:-1}, ArrowDown:{x:0,y:1},
+          ArrowLeft:{x:-1,y:0}, ArrowRight:{x:1,y:0},
+          w:{x:0,y:-1}, s:{x:0,y:1}, a:{x:-1,y:0}, d:{x:1,y:0},
+        };
+        const d = map[e.key];
+        if (!d || (d.x === -this.dir.x && d.y === -this.dir.y)) return;
+        this.next = d;
+        e.preventDefault();
+      }
+
+      _onTouch(e) {
+        e.preventDefault();
+        const t = e.touches[0];
+        const tx = t.clientX, ty = t.clientY;
+        const onEnd = te => {
+          const dx = te.changedTouches[0].clientX - tx;
+          const dy = te.changedTouches[0].clientY - ty;
+          if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+          const d = Math.abs(dx) > Math.abs(dy)
+            ? (dx > 0 ? {x:1,y:0} : {x:-1,y:0})
+            : (dy > 0 ? {x:0,y:1} : {x:0,y:-1});
+          if (d.x === -this.dir.x && d.y === -this.dir.y) return;
+          this.next = d;
+        };
+        this.canvas.addEventListener('touchend', onEnd, { once: true });
+      }
+    }
+
+    // ── Slot Machine ──────────────────────────────
+    class SlotGame {
+      constructor(canvas, scoreEl) {
+        this.canvas  = canvas;
+        this.scoreEl = scoreEl;
+        this.ctx     = canvas.getContext('2d');
+        this.W = 360; this.H = 460;
+        canvas.width = this.W; canvas.height = this.H;
+
+        this.CELL   = 90;   // symbol cell size
+        this.REEL_W = 90;
+        this.ROWS   = 3;
+        this.REEL_H = this.CELL * this.ROWS;
+        this.REEL_Y = 70;
+
+        // Symbol images: [coin, item1, item2, item3, person, flower]
+        const srcs = [
+          'images/coin_gif.gif',
+          'images/item_1.png',
+          'images/item_2.png',
+          'images/item_3.png',
+          'images/人物.png',
+          'images/花.png',
+        ];
+        this.imgs = srcs.map(s => { const i = new Image(); i.src = s; return i; });
+        this.N = srcs.length;
+
+        // HTML spin button (native GIF animation)
+        this.spinBtn = document.getElementById('slot-spin-btn');
+        this.spinBtn.style.display = 'block';
+        this.spinBtn.addEventListener('click', () => this.spin());
+
+        // Each reel drum: shuffled sequence of all symbols × 4
+        this.DRUM_LEN = this.N * 4;
+        this.drums   = [this._makeDrum(), this._makeDrum(), this._makeDrum()];
+        this.offsets = [0, 0, 0];
+
+        this.state    = 'idle';
+        this.results  = [0, 0, 0];
+        this.stopped  = [true, true, true];
+        this.winText  = '';
+        this.winCoins = 0;
+        this.frame    = 0;
+        this.SPIN_SPEED   = 18;   // px/frame while spinning
+        this.STOP_FRAMES  = [55, 90, 125];
+
+        this.running = true;
+        this.raf     = null;
+        this._onKey = this._onKey.bind(this);
+        document.addEventListener('keydown', this._onKey);
+
+        this.start();
+      }
+
+      _makeDrum() {
+        const arr = Array.from({length: this.DRUM_LEN}, (_, i) => i % this.N);
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      // Middle row shows drums[floor(offset/CELL) % DRUM_LEN]
+      _midSymbol(reel) {
+        return this.drums[reel][Math.floor(this.offsets[reel] / this.CELL) % this.DRUM_LEN];
+      }
+
+      _snapToResult(reel) {
+        const target = this.results[reel];
+        let k = Math.ceil(this.offsets[reel] / this.CELL);
+        const max = k + this.DRUM_LEN;
+        while (k < max && this.drums[reel][k % this.DRUM_LEN] !== target) k++;
+        this.offsets[reel] = k * this.CELL;
+      }
+
+      spin() {
+        if (this.state === 'spinning') return;
+        this.state    = 'spinning';
+        this.winText  = '';
+        this.winCoins = 0;
+        this.stopped  = [false, false, false];
+        this.results  = [0, 1, 2].map(() => Math.floor(Math.random() * this.N));
+        this.frame    = 0;
+      }
+
+      start() {
+        const loop = () => {
+          if (!this.running) return;
+          this.raf = requestAnimationFrame(loop);
+          this._tick();
+          this._draw();
+        };
+        this.raf = requestAnimationFrame(loop);
+      }
+
+      stop() {
+        this.running = false;
+        cancelAnimationFrame(this.raf);
+        document.removeEventListener('keydown', this._onKey);
+        this.spinBtn.style.display = 'none';
+      }
+
+      _tick() {
+        if (this.state !== 'spinning') return;
+        this.frame++;
+        for (let i = 0; i < 3; i++) {
+          if (this.stopped[i]) continue;
+          this.offsets[i] += this.SPIN_SPEED;
+          if (this.frame >= this.STOP_FRAMES[i]) {
+            this._snapToResult(i);
+            this.stopped[i] = true;
+          }
+        }
+        if (this.stopped.every(Boolean)) {
+          this.state = 'result';
+          this._evalResult();
+        }
+      }
+
+      _evalResult() {
+        const r = this.results;
+        this.winCoins = 0;
+        const allSame = r[0] === r[1] && r[1] === r[2];
+        const twoSame = r[0]===r[1] || r[1]===r[2] || r[0]===r[2];
+        const hasCoin = r.includes(0);
+
+        if (allSame && r[0] === 0) {
+          this.winCoins = 20; this.winText = 'JACKPOT!  +20 coins';
+        } else if (allSame) {
+          this.winCoins = 10; this.winText = 'BIG WIN!  +10 coins';
+        } else if (twoSame) {
+          this.winCoins = 3;  this.winText = 'WIN!  +3 coins';
+        } else if (hasCoin) {
+          this.winCoins = 1;  this.winText = '+1 coin';
+        } else {
+          this.winText = 'No luck...  Try again!';
+        }
+
+        if (this.winCoins > 0) {
+          const prev = parseInt(localStorage.getItem('coinCount') || '0', 10);
+          localStorage.setItem('coinCount', prev + this.winCoins);
+          if (typeof renderCoinHud === 'function') renderCoinHud();
+        }
+        this._updateScore();
+      }
+
+      _draw() {
+        const { ctx, W, H, CELL, REEL_W, REEL_H, REEL_Y } = this;
+        const h  = this._wheelHue();
+        const ch = (h + 180) % 360;
+
+        // Background
+        ctx.fillStyle = `hsl(${ch},40%,8%)`;
+        ctx.fillRect(0, 0, W, H);
+
+        // Title
+        ctx.fillStyle = '#ffd966';
+        ctx.font = "bold 22px 'Pixelify Sans'";
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('SLOT MACHINE', W / 2, 36);
+
+        // Reel gap: (360 - 3*90) / 4 = 22.5 ≈ 22
+        const gap = Math.floor((W - REEL_W * 3) / 4);
+
+        // Win-line highlight (middle row)
+        ctx.fillStyle = 'rgba(255,217,102,0.08)';
+        ctx.fillRect(0, REEL_Y + CELL, W, CELL);
+
+        for (let i = 0; i < 3; i++) {
+          const rx = gap + i * (REEL_W + gap);
+
+          // Reel background
+          ctx.fillStyle = `hsl(${ch},25%,11%)`;
+          ctx.fillRect(rx, REEL_Y, REEL_W, REEL_H);
+
+          // Clip and draw symbols
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(rx, REEL_Y, REEL_W, REEL_H);
+          ctx.clip();
+
+          const startCell = Math.floor(this.offsets[i] / CELL) - 1;
+          const pxOff     = this.offsets[i] % CELL;
+
+          for (let j = 0; j < this.ROWS + 2; j++) {
+            const ci   = ((startCell + j) % this.DRUM_LEN + this.DRUM_LEN) % this.DRUM_LEN;
+            const sym  = this.drums[i][ci];
+            const sy   = REEL_Y + j * CELL - pxOff;
+            const img  = this.imgs[sym];
+            ctx.imageSmoothingEnabled = false;
+            if (img.complete && img.naturalWidth > 0) {
+              ctx.drawImage(img, rx + 8, sy + 8, REEL_W - 16, CELL - 16);
+            }
+          }
+          ctx.restore();
+
+          // Reel border
+          ctx.strokeStyle = `hsl(${h},50%,30%)`;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(rx, REEL_Y, REEL_W, REEL_H);
+
+          // Middle row frame
+          ctx.strokeStyle = this.state === 'result' && this.winCoins > 0
+            ? '#ffd966' : `hsla(${h},60%,55%,0.5)`;
+          ctx.lineWidth = this.state === 'result' && this.winCoins > 0 ? 2.5 : 1.5;
+          ctx.strokeRect(rx, REEL_Y + CELL, REEL_W, CELL);
+        }
+
+        // Win/result text
+        const textY = REEL_Y + REEL_H + 22;
+        if (this.winText) {
+          ctx.fillStyle = this.winCoins > 0 ? '#6dffb3' : '#6878a0';
+          ctx.font = `bold ${this.winCoins > 5 ? 20 : 16}px 'Pixelify Sans'`;
+          ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+          ctx.fillText(this.winText, W / 2, textY);
+        }
+
+        // Spin button is an HTML element (see #slot-spin-btn)
+        // Dim it visually while spinning
+        if (this.spinBtn) {
+          this.spinBtn.style.opacity = this.state === 'spinning' ? '0.3' : '1';
+          this.spinBtn.style.pointerEvents = this.state === 'spinning' ? 'none' : 'auto';
+        }
+      }
+
+      _updateScore() {
+        const total = parseInt(localStorage.getItem('coinCount') || '0', 10);
+        this.scoreEl.querySelector('#game-score-num').textContent = total;
+      }
+
+      _wheelHue() {
+        try {
+          const s = JSON.parse(localStorage.getItem('aokey-bg'));
+          if (s && typeof s.h === 'number') return Math.round(s.h);
+        } catch (_) {}
+        return 220;
+      }
+
+      _onKey(e) {
+        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); this.spin(); }
+      }
+
+    }
+  </script>
+
+</body>
+</html>

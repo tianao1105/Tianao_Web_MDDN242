@@ -31,7 +31,7 @@
     /* The road: a long platform spanning full width */
     #shop-road {
       position: absolute;
-      bottom: 80px;            /* height from viewport bottom */
+      bottom: clamp(50px, 9vh, 80px);
       left: 0;
       right: 0;
       height: 6px;
@@ -42,10 +42,10 @@
     /* Market building: sits on the road, pinned to the right */
     #shop-market {
       position: absolute;
-      bottom: 80px;
-      right: 40px;
+      bottom: clamp(50px, 9vh, 80px);
+      right: clamp(8px, 2.5vw, 40px);
       image-rendering: pixelated;
-      height: min(60vh, 420px);
+      height: auto;   /* JS controls height */
       width: auto;
       display: block;
       z-index: 1;
@@ -54,8 +54,8 @@
     /* Showcase + items: in front of (to the left of) market */
     #shop-display-area {
       position: absolute;
-      bottom: 80px;
-      right: 580px;
+      bottom: clamp(50px, 9vh, 80px);
+      right: 0;          /* JS overrides this on load + resize */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -67,7 +67,7 @@
     #shop-showcases-row {
       display: flex;
       align-items: flex-end;
-      gap: 20px;
+      gap: clamp(8px, 2vw, 20px);
     }
 
     /* Each showcase unit: one item sitting on one showcase */
@@ -86,11 +86,11 @@
     }
 
     .shop-item-img {
-      height: min(9vh, 64px);
+      height: 64px;   /* JS overrides */
       width: auto;
       image-rendering: pixelated;
       display: block;
-      margin-bottom: -28px;
+      margin-bottom: -28px;  /* JS overrides */
       animation: itemSpin 2.4s linear infinite;
     }
 
@@ -98,7 +98,7 @@
     .showcase-unit:nth-child(3) .shop-item-img { animation-delay: -1.6s; }
 
     .shop-showcase-img {
-      height: min(16vh, 120px);
+      height: 120px;  /* JS overrides */
       width: auto;
       image-rendering: pixelated;
       display: block;
@@ -173,6 +173,16 @@
     #item-popup .popup-name  { font-size: 15px; font-weight: 700; color: #ffd966; letter-spacing: 0.1em; margin-bottom: 4px; }
     #item-popup .popup-desc  { font-size: 11px; color: #a0b0d0; margin-bottom: 6px; letter-spacing: 0.05em; }
     #item-popup .popup-price { font-size: 13px; color: #c8b87a; letter-spacing: 0.08em; }
+
+    @media (max-width: 600px) {
+      #controls-hint {
+        font-size: 10px;
+        padding: 5px 10px;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.6;
+      }
+    }
   </style>
 </head>
 <body class="shop-page">
@@ -183,6 +193,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="photography.html">Photography</a></li>
       <li><a href="shop.html" aria-current="page">Shop</a></li>
+      <li><a href="game.html">Games</a></li>
       <li><a href="about/index.html">About</a></li>
     </ul>
     <div class="nav-bottom-group">
@@ -239,6 +250,7 @@
   <script src="script.js"></script>
   <script src="shopEffects.js"></script>
   <script src="colorWheel.js"></script>
+  <script src="coinHud.js"></script>
   <script>
     CONFIG.playerScale = 7.5;
 
@@ -386,6 +398,45 @@
       localStorage.removeItem('shopPurchases');
       location.reload();
     });
+
+    // ── Responsive shop layout ────────────────────
+    const marketEl2 = document.getElementById('shop-market');
+    const displayEl = document.getElementById('shop-display-area');
+
+    function layoutShopScene() {
+      const vw    = window.innerWidth;
+      const style = getComputedStyle(document.documentElement);
+      const navW  = parseInt(style.getPropertyValue('--nav-w')) || 180;
+      const sceneW = vw - navW;
+
+      // Scale everything by scene width (caps at full size)
+      const marketH = Math.min(sceneW * 0.38, 420);
+      const scale   = marketH / 420;
+      marketEl2.style.height = marketH + 'px';
+
+      // Scale showcase items proportionally
+      const itemH      = Math.max(28, Math.round(64  * scale));
+      const showcaseH  = Math.max(50, Math.round(120 * scale));
+      const itemMargin = Math.round(-28 * scale);
+      document.querySelectorAll('.shop-item-img').forEach(el => {
+        el.style.height       = itemH + 'px';
+        el.style.marginBottom = itemMargin + 'px';
+      });
+      document.querySelectorAll('.shop-showcase-img').forEach(el => {
+        el.style.height = showcaseH + 'px';
+      });
+
+      // After height is applied, read the actual rendered width
+      requestAnimationFrame(() => {
+        const mWidth = marketEl2.offsetWidth;
+        if (!mWidth) return;
+        const mRight = Math.min(Math.max(8, vw * 0.025), 40);
+        displayEl.style.right = Math.round(mRight + mWidth + 24) + 'px';
+      });
+    }
+
+    window.addEventListener('resize', layoutShopScene);
+    window.addEventListener('load', layoutShopScene);
   </script>
 
 </body>

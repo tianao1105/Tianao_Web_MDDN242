@@ -11,6 +11,42 @@
   <meta name="description" content="About Tianao Wang">
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../side-nav.css">
+  <style>
+    #about-bio-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 48px;
+      max-width: 720px;
+      margin: 0 auto 40px;
+    }
+    #about-portrait-col {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    #portrait-img {
+      width: 260px;
+      max-width: 100%;
+      display: block;
+      border-radius: 4px;
+    }
+    @media (max-width: 600px) {
+      #about-bio-row {
+        flex-direction: column;
+        gap: 24px;
+      }
+      #about-portrait-col {
+        width: 100%;
+      }
+      #portrait-img {
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -20,6 +56,7 @@
       <li><a href="../index.html">Home</a></li>
       <li><a href="../photography.html">Photography</a></li>
       <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../game.html">Games</a></li>
       <li><a href="index.html" aria-current="page">About</a></li>
     </ul>
   </nav>
@@ -32,7 +69,7 @@
     <section class="works" aria-label="About me">
       <h2 class="section-title">TIANAO WANG</h2>
 
-      <div style="display:flex; align-items:flex-start; gap:48px; max-width:720px; margin:0 auto 40px;">
+      <div id="about-bio-row">
         <!-- Left: bio + email -->
         <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:16px;">
           <p style="color: var(--section-color); font-size: 17px; line-height: 2; margin:0;
@@ -48,10 +85,9 @@
         </div>
 
         <!-- Right: portrait + motto -->
-        <div style="flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:14px;">
+        <div id="about-portrait-col">
           <div style="position:relative;">
-            <img src="../images/1.png" alt="Tianao Wang" id="portrait-img"
-                 style="width:260px; display:block; border-radius:4px;" />
+            <img src="../images/1.png" alt="Tianao Wang" id="portrait-img" />
             <div id="portrait-bubble" style="
               display:none;
               position:absolute;
@@ -96,6 +132,7 @@
 
   <script src="../shopEffects.js"></script>
   <script src="../colorWheel.js"></script>
+  <script src="../coinHud.js"></script>
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
