@@ -108,6 +108,6 @@ On the **Games** page, pressing **E** while standing on a game card launches tha
 
 ## AI Collaboration
 
-I used Claude Code to help write and implement code throughout this project. All ideas and design decisions were my own — the AI translated them into working code.
+Throughout the entire project, I utilized Claude Code AI in Visual Studio Code to assist in writing and implementing the code. All the ideas and design decisions were independently completed by me, while the artificial intelligence transformed these ideas into executable code.
 
 I would describe what I wanted, and Claude would implement it. Without this, many technical features (the platformer physics, localStorage persistence, the shop proximity system) would have been beyond my current coding ability. AI made it possible to build what I could imagine but not yet write.
