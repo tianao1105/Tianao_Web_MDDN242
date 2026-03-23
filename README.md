@@ -19,6 +19,7 @@ The visual style throughout is intentionally minimal. A clean layout with a rest
 Photography became its own section during development, a separate space from the design projects. Adding it felt natural — the same grid layout, the same popup interaction — but with a different tone. Where the project cards show made things, the photo grid shows seen things.
 
 Looking back, the most interesting part of this process was how the constraints of a real webpage — fixed navigation, scroll behaviour, DOM elements with actual positions — became creative material rather than limitations. The game had to work within the page, not despite it.
+
 Finally, I added three mini-games to make the process of obtaining gold coins less boring. More uses for the gold coins will be added later.
 
 ## Project Structure
