@@ -12,15 +12,20 @@ The starting point for this project was a simple question: what if visiting a po
 
 The core concept was to treat the page itself as a game world. Rather than building a separate game screen, the website's own elements (navigation links, card borders, the PLAY button, the title underline) all become platforms the player can jump on. This meant the layout and the game had to be designed together. Moving a card or adjusting a nav link would change the level. It made the design process feel more like building a world than building a webpage.
 
-A lot of the features that ended up in the final site were not planned from the beginning. Many ideas came from simply sitting with the page and observing, noticing a gap that could become a platform, or a button that felt like it should do something more. The shop system grew out of that kind of exploration. I had been thinking about RPG games, where buying items from a merchant is a familiar and satisfying loop. Coins collected through gameplay could be spent in a shop to unlock visual effects that change how the whole site looks and feels: rain, grass growing on the navigation bar, a repeating coffee grid background. Each item does something slightly absurd, which felt right for a creative portfolio.
+A lot of the features that ended up in the final site were not planned from the beginning. Many ideas came from simply sitting with the page and observing, noticing a gap that could become a platform, or a button that felt like it should do something more. The shop system grew out of that kind of exploration. I have always been fond of the store purchase interface in games, so I designed this purchase background element. Coins collected through gameplay could be spent in a shop to unlock visual effects that change how the whole site looks and feels: rain, grass growing on the navigation bar, a repeating coffee grid background. Each item does something slightly absurd, which felt right for a creative portfolio.
 
-The visual style throughout is intentionally minimal. A clean layout with a restrained colour palette keeps the focus on the work itself. The game elements are layered on top without overwhelming the content. The character is small, the effects are subtle until you choose to activate them. This balance between calm and playful is something I kept returning to throughout the process.
+The visual style of the entire game remains simple. A clean layout with a restrained colour palette keeps the focus on the work itself. The game elements are layered on top without overwhelming the content. The character is small, the effects are subtle until you choose to activate them. This balance between calm and playful is something I kept returning to throughout the process.(If you want to change the color, then you can also choose the color you like.)
 
 Photography became its own section during development, a separate space from the design projects. Adding it felt natural, same grid layout, same popup interaction, but with a different tone. Where the project cards show made things, the photo grid shows seen things.
 
+Finally, I added three mini-games to make the process of obtaining gold coins less boring. More uses for the gold coins will be added later.
+
 Looking back, the most interesting part of this process was how the constraints of a real webpage (fixed navigation, scroll behaviour, DOM elements with actual positions) became creative material rather than limitations. The game had to work within the page, not despite it.
 
-Finally, I added three mini-games to make the process of obtaining gold coins less boring. More uses for the gold coins will be added later.
+
+## Picture Material
+I used Pixel Studio to create all the necessary element images for my website.
+All the other pictures are my own creations.
 
 ## Project Structure
 
