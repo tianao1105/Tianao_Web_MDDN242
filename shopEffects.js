@@ -22,7 +22,7 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 500;
+      z-index: 1;
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.6s;
