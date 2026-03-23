@@ -62,6 +62,7 @@
   <div id="coin-hud"></div>
 
   <div id="controls-hint">← → MOVE &nbsp;·&nbsp; ↑ JUMP &nbsp;·&nbsp; SPACE(air) FLY &nbsp;·&nbsp; ↓ DROP</div>
+  <div id="card-hint"></div>
 
   <!-- 第一步：加载作品数据 -->
   <script src="works.js"></script>
@@ -116,6 +117,45 @@
 
     overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+
+  <script>
+    // ── Work card proximity hint ───────────────────
+    const cardHintEl = document.getElementById('card-hint');
+
+    function workCardHintLoop() {
+      if (!gameActive || overlay.classList.contains('open')) {
+        cardHintEl.classList.remove('show');
+        requestAnimationFrame(workCardHintLoop);
+        return;
+      }
+
+      const px = player.docX - window.scrollX + player.w / 2;
+      const py = player.docY - window.scrollY + player.h;
+
+      let found = null;
+      document.querySelectorAll('.work-media').forEach(el => {
+        if (found) return;
+        const r = el.getBoundingClientRect();
+        if (Math.abs(py - r.top) < 16 && px > r.left - 8 && px < r.right + 8) {
+          found = el;
+        }
+      });
+
+      if (found) {
+        const desc = found.dataset.desc || '';
+        const r = found.getBoundingClientRect();
+        cardHintEl.innerHTML = `<span class="hint-name">${desc}</span>`;
+        cardHintEl.style.left = (r.left + r.width / 2) + 'px';
+        cardHintEl.style.top  = r.top + 'px';
+        cardHintEl.classList.add('show');
+      } else {
+        cardHintEl.classList.remove('show');
+      }
+
+      requestAnimationFrame(workCardHintLoop);
+    }
+    workCardHintLoop();
   </script>
 
 </body>

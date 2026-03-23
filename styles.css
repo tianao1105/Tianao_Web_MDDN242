@@ -558,6 +558,40 @@ body.game-active #game-toggle {
 .cw-range { width: 100%; cursor: pointer; }
 
 /* ════════════════════════════════════════
+   CARD PROXIMITY HINT
+   ════════════════════════════════════════ */
+#card-hint {
+  position: fixed;
+  z-index: 20000;
+  background: rgba(13, 27, 62, 0.92);
+  border: 1.5px solid rgba(200, 184, 122, 0.7);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 13px;
+  color: #d0eaff;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-100%);
+  margin-top: -12px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+#card-hint.show { opacity: 1; }
+#card-hint .hint-name { color: #ffd966; font-weight: 700; margin-right: 8px; }
+#card-hint kbd {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 3px;
+  padding: 0 5px;
+  font-size: 12px;
+  color: #a0ffc0;
+  margin: 0 3px;
+}
+
+/* ════════════════════════════════════════
    SHOP PAGE
    ════════════════════════════════════════ */
 #shop-scene {

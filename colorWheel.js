@@ -239,5 +239,47 @@
     /* sliders */
     lSlider.addEventListener('input', function () { state.l = +this.value; refresh(); });
     aSlider.addEventListener('input', function () { state.a = this.value / 100; refresh(); });
+
+    /* ── colour-wheel proximity hint ───────────── */
+    var cwHint = document.createElement('div');
+    cwHint.id = 'cw-proximity-hint';
+    cwHint.style.cssText =
+      'position:fixed;z-index:20000;pointer-events:none;' +
+      'background:rgba(13,27,62,0.92);border:1.5px solid rgba(200,184,122,0.7);' +
+      'border-radius:6px;padding:7px 14px;' +
+      'font-family:\'Pixelify Sans\',sans-serif;font-size:13px;' +
+      'color:#ffd966;letter-spacing:0.06em;white-space:nowrap;' +
+      'transform:translateX(-50%) translateY(-100%);margin-top:-12px;' +
+      'opacity:0;transition:opacity 0.15s;';
+    document.body.appendChild(cwHint);
+    cwHint.textContent = 'Pick your favorite color~';
+
+    function cwHintLoop() {
+      /* player / gameActive are const/let globals in script.js — not on window */
+      try {
+        if (typeof gameActive === 'undefined' || !gameActive) {
+          cwHint.style.opacity = '0';
+          requestAnimationFrame(cwHintLoop);
+          return;
+        }
+        var r   = thumb.getBoundingClientRect();
+        var rcx = r.left + r.width  / 2;
+        var rcy = r.top  + r.height / 2;
+        var px  = player.docX - window.scrollX + player.w / 2;
+        var py  = player.docY - window.scrollY + player.h / 2;
+        var dist = Math.hypot(px - rcx, py - rcy);
+        if (dist < 80) {
+          cwHint.style.left    = rcx + 'px';
+          cwHint.style.top     = r.top + 'px';
+          cwHint.style.opacity = '1';
+        } else {
+          cwHint.style.opacity = '0';
+        }
+      } catch (_) {
+        cwHint.style.opacity = '0';
+      }
+      requestAnimationFrame(cwHintLoop);
+    }
+    cwHintLoop();
   });
 })();

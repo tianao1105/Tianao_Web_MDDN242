@@ -25,11 +25,14 @@ Looking back, the most interesting part of this process was how the constraints 
 ├── index.html              # Home page
 ├── shop.html               # Shop page
 ├── photography.html        # Photography page
+├── game.html               # Games page (mini-game arcade)
 ├── about/
 │   └── index.html          # About page
 ├── styles.css              # Global styles
 ├── script.js               # Game engine
 ├── shopEffects.js          # Shop item effects (runs on all pages)
+├── colorWheel.js           # Background colour picker (runs on all pages)
+├── coinHud.js              # Coin HUD (runs on all pages)
 ├── works.js                # Home project data
 ├── photography_works.js    # Photography page data
 ├── images/
@@ -70,11 +73,30 @@ Hold the coin button to drop coins from above — collect them by walking into t
 
 Visit the **Shop** page to spend coins on items that change how the site looks and feels.
 
+Visit the **Games** page to play three mini-games: **AoFly** (Flappy Bird-style), **Coin Snake**, and **Slots**. Walk the character onto a game card and press **E** to launch it, or click the card directly. Coins earned in mini-games are added to your total.
+
 Page elements that become platforms:
 - Title underline
 - Sidebar navigation links
-- Project card edges
+- Project card edges (home page & games page)
 - PLAY button
+
+### Proximity hints
+
+Walking the character into certain elements triggers contextual speech bubbles:
+
+| Element | Message |
+|---------|---------|
+| Home nav link | *"Welcome back!"* |
+| Photography nav link | *"Come see what I found~"* |
+| Shop nav link | *"Why is the background so plain? Come take a look!"* |
+| Games nav link | *"I want to play this!"* |
+| About nav link | *"Wow, that's me!"* |
+| Color wheel | *"Pick your favorite color~"* |
+| Home project cards | Project description |
+| Game cards | Game name + `[E] Play` |
+
+On the **Games** page, pressing **E** while standing on a game card launches that game directly.
 
 ## AI Collaboration
 

@@ -22,12 +22,12 @@ const WORKS = [
     title: "Project 2",
     thumb: "images/image2.png",
     img:   "images/image2.png",
-    desc:  "DSDN141 project",
+    desc:  "A work",
   },
   {
     title: "Project 3",
     thumb: "images/image3.png",
     img:   "images/image3.png",
-    desc:  "DSDN141 project",
+    desc:  "A work",
   },
 ];

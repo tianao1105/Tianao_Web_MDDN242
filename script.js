@@ -94,7 +94,7 @@ function collectPlatforms() {
   });
   pushEl(document.getElementById('game-toggle'), 'toggle');
 
-  document.querySelectorAll('.work-media').forEach(el => {
+  document.querySelectorAll('.work-media, .game-card').forEach(el => {
     pushEl(el, 'card');
     // card bottom edge
     const r   = el.getBoundingClientRect();
@@ -653,3 +653,70 @@ window.addEventListener('resize', () => {
 });
 
 resizeCanvas();
+
+// ════════════════════════════════════════
+// Nav link proximity hints
+// ════════════════════════════════════════
+(function () {
+  const NAV_HINTS = {
+    'about':            "Wow, that's me!",
+    'photography.html': 'Come see what I found~',
+    'shop.html':        'Why is the background so plain? Come take a look!',
+    'game.html':        'I want to play this!',
+    'index.html':       'Welcome back!',
+  };
+
+  function getHintForLink(el) {
+    const href = el.getAttribute('href') || '';
+    for (const key of Object.keys(NAV_HINTS)) {
+      if (href.includes(key)) return NAV_HINTS[key];
+    }
+    return null;
+  }
+
+  const hint = document.createElement('div');
+  hint.id = 'nav-hint';
+  hint.style.cssText =
+    'position:fixed;z-index:20000;pointer-events:none;' +
+    'background:rgba(13,27,62,0.92);border:1.5px solid rgba(200,184,122,0.7);' +
+    'border-radius:6px;padding:7px 14px;' +
+    "font-family:'Pixelify Sans',sans-serif;font-size:13px;" +
+    'color:#ffd966;letter-spacing:0.06em;white-space:nowrap;' +
+    'transform:translateX(-50%) translateY(-100%);margin-top:-12px;' +
+    'opacity:0;transition:opacity 0.15s;';
+  document.body.appendChild(hint);
+
+  function navHintLoop() {
+    if (!gameActive) { hint.style.opacity = '0'; requestAnimationFrame(navHintLoop); return; }
+
+    const px = player.docX - window.scrollX + player.w / 2;
+    const py = player.docY - window.scrollY + player.h;   // feet
+
+    let found = null;
+    document.querySelectorAll('.side-nav a').forEach(el => {
+      if (found) return;
+      const r = el.getBoundingClientRect();
+      // standing on top: feet within 14px above the link's top edge, horizontally inside
+      if (py >= r.top - 14 && py <= r.top + 8 && px >= r.left - 4 && px <= r.right + 4) {
+        found = el;
+      }
+    });
+
+    if (found) {
+      const msg = getHintForLink(found);
+      if (msg) {
+        const r = found.getBoundingClientRect();
+        hint.textContent   = msg;
+        hint.style.left    = (r.left + r.width / 2) + 'px';
+        hint.style.top     = r.top + 'px';
+        hint.style.opacity = '1';
+      } else {
+        hint.style.opacity = '0';
+      }
+    } else {
+      hint.style.opacity = '0';
+    }
+    requestAnimationFrame(navHintLoop);
+  }
+  navHintLoop();
+}());
