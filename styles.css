@@ -421,7 +421,7 @@ body.game-active #game-toggle {
   }
   .side-nav-logo { font-size: 20px; margin-bottom: 10px; }
   .side-nav a    { font-size: 13px; gap: 4px; }
-  .side-nav ul   { gap: 10px; }
+  .side-nav ul   { gap: 10px; overflow-y: auto; flex-shrink: 1; }
 
   .side-nav a[aria-current="page"]::before {
     width: 28px;
