@@ -1,14 +1,14 @@
 // ════════════════════════════════════════
-// 作品数据 — 在这里添加 / 修改作品
+// Works data — add / edit works here
 // ════════════════════════════════════════
 //
-// 每个作品一个 {} 块，字段说明：
-//   title  — 卡片 aria-label 和弹出层标题
-//   thumb  — 首页卡片缩略图路径
-//   img    — 弹出层大图路径（可以和 thumb 相同）
-//   desc   — 弹出层介绍文字
+// Each work is one {} block. Fields:
+//   title  — card aria-label and modal title
+//   thumb  — home page card thumbnail path
+//   img    — modal large image path (can be same as thumb)
+//   desc   — modal description text
 //
-// 添加新作品：在数组末尾复制一个 {} 块粘贴即可
+// To add a new work: copy a {} block and paste it at the end of the array
 // ════════════════════════════════════════
 
 const WORKS = [

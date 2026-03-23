@@ -13,7 +13,7 @@
 </head>
 <body>
 
-  <!-- 左侧固定导航 -->
+  <!-- Side navigation -->
   <nav class="side-nav" aria-label="Primary">
     <span class="side-nav-logo"><img src="favicon-32x32.png" alt="" /><span>Aokey</span></span>
     <ul>
@@ -23,7 +23,7 @@
       <li><a href="game.html">Games</a></li>
       <li><a href="about/index.html">About</a></li>
     </ul>
-    <!-- 底部按钮组：投币 + PLAY -->
+    <!-- Bottom group: coin spawn + PLAY -->
     <div class="nav-bottom-group">
       <button id="spawn-coin">
         <img src="images/insert_coins.gif" alt="Spawn coin" />
@@ -38,7 +38,7 @@
   <main id="main-content">
     <div class="underline" aria-hidden="true" id="underline-el"></div>
 
-    <section class="works" aria-label="作品展示">
+    <section class="works" aria-label="Works showcase">
    
       <div class="works-grid" id="works-grid"></div>
     </section>
@@ -48,7 +48,7 @@
 
   <footer><small>&copy; <span id="year"></span> Tianao Wang</small></footer>
 
-  <!-- 弹出层 -->
+  <!-- Modal overlay -->
   <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
     <div class="modal">
       <h2 class="modal-title" id="modal-title"></h2>
@@ -57,17 +57,17 @@
     </div>
   </div>
 
-  <!-- 游戏图层 -->
+  <!-- Game layer -->
   <canvas id="game-canvas"></canvas>
   <div id="coin-hud"></div>
 
   <div id="controls-hint">← → MOVE &nbsp;·&nbsp; ↑ JUMP &nbsp;·&nbsp; SPACE(air) FLY &nbsp;·&nbsp; ↓ DROP</div>
   <div id="card-hint"></div>
 
-  <!-- 第一步：加载作品数据 -->
+  <!-- Step 1: load works data -->
   <script src="works.js"></script>
 
-  <!-- 第二步：生成卡片 -->
+  <!-- Step 2: generate cards -->
   <script>
     const grid = document.getElementById('works-grid');
     WORKS.forEach(w => {
@@ -82,13 +82,13 @@
     });
   </script>
 
-  <!-- 第三步：游戏脚本 -->
+  <!-- Step 3: game scripts -->
   <script src="script.js"></script>
   <script src="shopEffects.js"></script>
   <script src="colorWheel.js"></script>
   <script src="coinHud.js"></script>
 
-  <!-- 第四步：弹出层事件 -->
+  <!-- Step 4: modal events -->
   <script>
     const overlay    = document.getElementById('modal-overlay');
     const modalImg   = document.getElementById('modal-img');

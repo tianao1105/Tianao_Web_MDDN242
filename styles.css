@@ -97,7 +97,7 @@ header { text-align: center; }
 
 .works-grid {
   display: grid;
-  /* auto-fit: 卡片最小 260px，屏幕越窄列数自动减少 */
+  /* auto-fit: cards min 260px, fewer columns on narrower screens */
   grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
   gap: var(--card-gap);
   justify-items: center;
@@ -195,7 +195,7 @@ footer { text-align: center;
   pointer-events: none;
   z-index: 9999;
   image-rendering: pixelated;
-  /* 尺寸完全由 JS 控制，避免 CSS 与缓冲区不同步导致变形 */
+  /* size fully controlled by JS to keep CSS and canvas buffer in sync */
 }
 
 body.game-active,
@@ -258,7 +258,7 @@ body.game-active #spawn-coin { display: flex; }
 }
 
 /* ════════════════════════════════════════
-   左侧固定导航
+   Side navigation
    ════════════════════════════════════════ */
 .side-nav {
   position: fixed;
@@ -332,7 +332,7 @@ body.game-active #game-toggle {
   opacity: 0.6;
 }
 
-/* ── PLAY 按钮（导航底部） ── */
+/* ── PLAY button (nav bottom) ── */
 @keyframes breathe {
   0%, 100% {
     box-shadow: 0 0 6px 1px rgba(21, 38, 122, 0.2),
@@ -347,7 +347,7 @@ body.game-active #game-toggle {
 }
 
 .nav-bottom-group {
-  margin-top: auto;   /* 把整组推到导航最底部 */
+  margin-top: auto;   /* push group to the bottom of the nav */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -374,13 +374,13 @@ body.game-active #game-toggle {
   box-shadow: 0 0 20px 6px rgba(21, 38, 122, 0.4);
 }
 
-/* 游戏激活时 EXIT 样式 */
+/* EXIT style when game is active */
 body.game-active #game-toggle {
   animation: none;
   opacity: 0.6;
 }
 
-/* 平板 / 小桌面 */
+/* Tablet / small desktop */
 @media (max-width: 768px) {
   :root { --nav-w: 140px; }
 
@@ -395,7 +395,7 @@ body.game-active #game-toggle {
   }
 }
 
-/* 大屏 — 卡片和间距放大 */
+/* Large screen — enlarge cards and spacing */
 @media (min-width: 1200px) {
   :root {
     --card-gap: 32px;
@@ -405,7 +405,7 @@ body.game-active #game-toggle {
   }
 }
 
-/* 手机 — 导航保持左侧，缩小宽度和字号 */
+/* Mobile — nav stays on the left, reduce width and font size */
 @media (max-width: 600px) {
   :root {
     --card-gap: 14px;
@@ -435,7 +435,7 @@ body.game-active #game-toggle {
 }
 
 /* ════════════════════════════════════════
-   弹出层
+   Modal overlay
    ════════════════════════════════════════ */
 .modal-overlay {
   position: fixed;

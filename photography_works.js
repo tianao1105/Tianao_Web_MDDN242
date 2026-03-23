@@ -1,5 +1,5 @@
 // ════════════════════════════════════════
-// 摄影作品数据 — 在这里添加 / 修改作品
+// Photography works data — add / edit works here
 // ════════════════════════════════════════
 const PHOTO_WORKS = [
   { title: "Photo 1", thumb: "photo/photo_1.jpg", img: "photo/photo_1.jpg", desc: "" },
