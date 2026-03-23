@@ -20,7 +20,7 @@ Photography became its own section during development, a separate space from the
 
 Finally, I added three mini-games to make the process of obtaining gold coins less boring. More uses for the gold coins will be added later.
 
-Looking back, the most interesting part of this process was how the constraints of a real webpage (fixed navigation, scroll behaviour, DOM elements with actual positions) became creative material rather than limitations. The game had to work within the page, not despite it.
+Looking back on the entire process, the most interesting part was that the various limitations of the real web page (fixed navigation bar, scrolling behavior, and fixed range) actually turned into creative resources rather than obstacles. This game must run within the web page, rather than forcibly proceeding regardless of the existence of the web page. Although the web page may not focus on a specific point, I wanted to allow the user or the player to explore as much as possible. I hope this will make them say "This is interesting" after discovering an element. I think this is the goal I want to achieve.
 
 
 ## Picture Material
