@@ -279,7 +279,7 @@
   <script src="colorWheel.js"></script>
   <script src="coinHud.js"></script>
   <script>
-    CONFIG.playerScale = 7.5;
+    CONFIG.playerScale = window.innerWidth <= 600 ? 4 : 7.5;
 
     // ── Item definitions ─────────────────────────
     const SHOWCASE_ITEMS = [

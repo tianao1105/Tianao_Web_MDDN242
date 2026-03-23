@@ -65,26 +65,30 @@
     }
     #coffee-grid {
       position: absolute;
-      top: -120px; left: -120px;
+      top: var(--cg-offset, -120px); left: var(--cg-offset, -120px);
       display: flex;
       flex-wrap: wrap;
       animation: coffeeDiag 2s linear infinite;
     }
     @keyframes coffeeDiag {
       from { transform: translate(0, 0); }
-      to   { transform: translate(120px, 120px); }
+      to   { transform: translate(var(--cg-size, 120px), var(--cg-size, 120px)); }
     }
     .coffee-cup {
       opacity: 0.5;
-      width: 120px; height: 120px;
+      width: var(--cg-size, 120px); height: var(--cg-size, 120px);
       display: flex; align-items: center; justify-content: center;
       transform: rotate(-55deg);
       flex-shrink: 0;
     }
     .coffee-cup img {
-      width: 80px; height: 80px;
+      width: calc(var(--cg-size, 120px) * 0.67);
+      height: calc(var(--cg-size, 120px) * 0.67);
       image-rendering: pixelated;
       display: block;
+    }
+    @media (max-width: 600px) {
+      :root { --cg-size: 64px; --cg-offset: -64px; }
     }
   `;
   document.head.appendChild(style);
@@ -189,8 +193,9 @@
 
     // Coffee grid (item_3.png tiles)
     const grid = document.getElementById('coffee-grid');
-    const cols = Math.ceil(window.innerWidth  / 120) + 3;
-    const rows = Math.ceil(window.innerHeight / 120) + 3;
+    const cgSize = window.innerWidth <= 600 ? 64 : 120;
+    const cols = Math.ceil(window.innerWidth  / cgSize) + 3;
+    const rows = Math.ceil(window.innerHeight / cgSize) + 3;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const cup = document.createElement('div');
